@@ -4,11 +4,12 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Welcome David Smith!</title>
+<title>David Smith Dashboard</title>
 </head>
 <body>
-
-
+<center>
+<h1>Welcome David Smith to your dashboard!</h1>
+</center>
 
 </body>
 </html>
