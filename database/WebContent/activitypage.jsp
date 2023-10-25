@@ -9,14 +9,13 @@
 <title>Activity page</title>
 </head>
 
-<center><h1>Welcome! You have been successfully logged in</h1> </center> <br> <br> <br>
+<center><h1>Welcome! You have been successfully logged in</h1> </center> <br>
 
 	<center> 
-	<h4>Please include: how many trees(1-7), size and height of each tree, location, distance from house, and 3 pictures	 </h4>
+	<h4>Please include the following: how many trees(1-7), size and height of each tree, location, distance from house, and 3 pictures	 </h4>
 	
 	<form action = "davidSmithDashboard.jsp" method = "post">
-		<label for = "requestQuote">Initial Quote: </label> <br>
-		<textarea name = "requestQuote" id = "requestQuote" rows = "12" cols = "125"></textarea> <br> <br> <br>
+		<textarea name = "requestQuote" id = "requestQuote" rows = "12" cols = "125"></textarea> <br> 
 		<input type = "submit" value = "Submit Initial Quote">
 		
 		</center>
