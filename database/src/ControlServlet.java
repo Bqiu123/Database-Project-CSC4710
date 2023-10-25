@@ -18,6 +18,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
+import java.util.regex.Pattern;
 
 
 public class ControlServlet extends HttpServlet {
@@ -114,8 +115,8 @@ public class ControlServlet extends HttpServlet {
 			 			 			 			 
 	    	 }
 	    	 else {
-	    		 request.setAttribute("loginStr","Login Failed: Please check your credentials.");
-	    		 request.getRequestDispatcher("login.jsp").forward(request, response);
+				request.setAttribute("loginFailedStr","Login Failed: Wrong password or username.");
+				request.getRequestDispatcher("login.jsp").forward(request, response);
 	    	 }
 	    }
 	           
@@ -133,8 +134,42 @@ public class ControlServlet extends HttpServlet {
 	   	 	String adress_state = request.getParameter("adress_state"); 
 	   	 	String adress_zip_code = request.getParameter("adress_zip_code"); 	   	 	
 	   	 	String confirm = request.getParameter("confirmation");
+
+			Pattern namePattern = Pattern.compile("^[a-zA-Z]+$");
+			Pattern emailPattern = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
+			Pattern phonePattern = Pattern.compile("^\\d{3}-\\d{3}-\\d{4}$");
+			Pattern creditCardPattern = Pattern.compile("^\\d{4}-\\d{4}-\\d{4}-\\d{4}$");
+	 
+			if (!namePattern.matcher(firstName).matches() || !namePattern.matcher(lastName).matches()) {
+				request.setAttribute("errorOne", "Names can only contain letters.");
+				request.getRequestDispatcher("register.jsp").forward(request, response);
+				return;
+			}
+	 
+			if (!emailPattern.matcher(email).matches()) {
+				request.setAttribute("errorOne", "Invalid email format.");
+				request.getRequestDispatcher("register.jsp").forward(request, response);
+				return;
+			}
+	 
+			if (!phonePattern.matcher(phoneNumber).matches()) {
+				request.setAttribute("errorOne", "Phone number format should be XXX-XXX-XXXX.");
+				request.getRequestDispatcher("register.jsp").forward(request, response);
+				return;
+			}
+	 
+			if (!creditCardPattern.matcher(creditCardNumber).matches()) {
+				request.setAttribute("errorOne", "Credit card format should be XXXX-XXXX-XXXX-XXXX.");
+				request.getRequestDispatcher("register.jsp").forward(request, response);
+				return;
+			}
 	   	 	
 	   	 	if (password.equals(confirm)) {
+				if (userDAO.checkPhoneNumber(phoneNumber)) {
+		   	     request.setAttribute("errorOne", "Phone number already in use.");
+		   	     request.getRequestDispatcher("register.jsp").forward(request, response);
+		   	     return;
+		   	 }
 	   	 		if (!userDAO.checkEmail(email)) {
 		   	 		System.out.println("Registration Successful! Added to database");
 		            user users = new user(email,firstName, lastName, password, creditCardNumber, phoneNumber, role, adress_street_num,  adress_street,  adress_city,  adress_state,  adress_zip_code);

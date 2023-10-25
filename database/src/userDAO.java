@@ -264,6 +264,14 @@ public class userDAO
     	return false;
     }
     
+    public boolean checkPhoneNumber(String phoneNumber) throws SQLException {
+        String sql = "SELECT * FROM User WHERE phoneNumber = ?";
+        connect_func();
+        preparedStatement = (PreparedStatement) connect.prepareStatement(sql);
+        preparedStatement.setString(1, phoneNumber);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        return resultSet.next();
+    }
     
     public void init() throws SQLException, FileNotFoundException, IOException{
     	connect_func();
