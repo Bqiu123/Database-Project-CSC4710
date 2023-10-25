@@ -6,5 +6,4 @@
 
 <%
 	String quoteString = request.getParameter("quoteString");
-	
 %>

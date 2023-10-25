@@ -9,7 +9,7 @@
 <title>Activity page</title>
 </head>
 
-<center><h1>Welcome! You have been successfully logged in</h1> </center> <br>
+<center><h1>Welcome! You have been successfully logged in</h1> </center> <br> <br>
 
 	<center> 
 	<h4>Please include the following: how many trees(1-7), size and height of each tree, location, distance from house, and 3 pictures	 </h4>
