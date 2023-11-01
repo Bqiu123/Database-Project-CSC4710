@@ -1,5 +1,6 @@
 public class user 
 {
+		protected String id;
 		protected String password;
 	 	protected String email;
 	    protected String firstName;
@@ -22,15 +23,16 @@ public class user
 	        this.email = email;
 	    }
 	    
-	    public user(String email,String firstName, String lastName, String password,String creditCardNumber,String phoneNumber, String role, String adress_street_num, String adress_street, String adress_city, String adress_state,String adress_zip_code) 
+	    public user(String id, String email,String firstName, String lastName, String password,String creditCardNumber,String phoneNumber, String role, String adress_street_num, String adress_street, String adress_city, String adress_state,String adress_zip_code) 
 	    {
-	    	this(firstName,lastName,password,creditCardNumber,phoneNumber,role, adress_street_num,  adress_street,  adress_city,  adress_state,  adress_zip_code);
+	    	this(id, firstName,lastName,password,creditCardNumber,phoneNumber,role, adress_street_num,  adress_street,  adress_city,  adress_state,  adress_zip_code);
 	    	this.email = email;
 	    }
 	 
 	
-	    public user(String firstName, String lastName, String password,String creditCardNumber,String phoneNumber, String role, String adress_street_num, String adress_street, String adress_city, String adress_state,String adress_zip_code) 
+	    public user(String id,String firstName, String lastName, String password,String creditCardNumber,String phoneNumber, String role, String adress_street_num, String adress_street, String adress_city, String adress_state,String adress_zip_code) 
 	    {
+	    	this.id = id;
 	    	this.firstName = firstName;
 	    	this.lastName = lastName;
 	    	this.password = password;
@@ -44,7 +46,15 @@ public class user
 	        this.adress_zip_code = adress_zip_code;
 	    }
 	    
-	   //getter and setter methods
+	   //getter and setter methods 
+	    
+	    public String getId() {
+	        return id;
+	    }
+	    public void setId(String id) {
+	        this.id = id;
+	    }
+	    
 	    public String getEmail() {
 	        return email;
 	    }
