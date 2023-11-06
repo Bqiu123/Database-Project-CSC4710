@@ -13,6 +13,11 @@ public class user
 	    protected String adress_city;
 	    protected String adress_state;
 	    protected String adress_zip_code;
+	    protected String tree_amt;
+	    protected String tree_size;
+	    protected String tree_height;
+	    protected String tree_distance;
+	    protected String tree_location;
 
 	    //constructors
 	    public user() {
@@ -23,14 +28,14 @@ public class user
 	        this.email = email;
 	    }
 	    
-	    public user(String id, String email,String firstName, String lastName, String password,String creditCardNumber,String phoneNumber, String role, String adress_street_num, String adress_street, String adress_city, String adress_state,String adress_zip_code) 
+	    public user(String id, String email,String firstName, String lastName, String password,String creditCardNumber,String phoneNumber, String role, String adress_street_num, String adress_street, String adress_city, String adress_state,String adress_zip_code, String tree_amt, String tree_size, String tree_height, String tree_distance, String tree_location) 
 	    {
-	    	this(id, firstName,lastName,password,creditCardNumber,phoneNumber,role, adress_street_num,  adress_street,  adress_city,  adress_state,  adress_zip_code);
+	    	this(id, firstName,lastName,password,creditCardNumber,phoneNumber,role, adress_street_num,  adress_street,  adress_city,  adress_state,  adress_zip_code, tree_amt, tree_size, tree_height, tree_distance, tree_location);
 	    	this.email = email;
 	    }
 	 
 	
-	    public user(String id,String firstName, String lastName, String password,String creditCardNumber,String phoneNumber, String role, String adress_street_num, String adress_street, String adress_city, String adress_state,String adress_zip_code) 
+	    public user(String id,String firstName, String lastName, String password,String creditCardNumber,String phoneNumber, String role, String adress_street_num, String adress_street, String adress_city, String adress_state,String adress_zip_code, String tree_amt, String tree_size, String tree_height, String tree_distance, String tree_location) 
 	    {
 	    	this.id = id;
 	    	this.firstName = firstName;
@@ -44,6 +49,11 @@ public class user
 	        this.adress_city= adress_city;
 	        this.adress_state = adress_state;
 	        this.adress_zip_code = adress_zip_code;
+	        this.tree_amt = tree_amt;
+	        this.tree_size = tree_size;
+	        this.tree_height = tree_height;
+	        this.tree_distance = tree_distance;
+	        this.tree_location = tree_location;
 	    }
 	    
 	   //getter and setter methods 
@@ -131,5 +141,37 @@ public class user
 	    public void setAdress_zip_code(String adress_zip_code) {
 	        this.adress_zip_code = adress_zip_code;
 	    }
+	    
+	    public String getTree_Amt() {
+	        return tree_amt;
+	    }
+	    public void setTree_Amt(String tree_amt) {
+	        this.tree_amt = tree_amt;
+	    }
+	    public String getTree_Size() {
+	        return tree_size;
+	    }
+	    public void setTree_Size(String tree_size) {
+	        this.tree_size = tree_size;
+	    }
+	    public String getTree_Height() {
+	        return tree_height;
+	    }
+	    public void setTree_Height(String tree_height) {
+	        this.tree_height = tree_height;
+	    }
+	    public String getTree_Distance() {
+	        return tree_distance;
+	    }
+	    public void setTree_Distance(String tree_distance) {
+	        this.tree_distance = tree_distance;
+	    }
+	    public String getTree_Location() {
+	        return tree_location;
+	    }
+	    public void setTree_Location(String tree_location) {
+	        this.tree_location = tree_location;
+	    }
+	    
 	    
 	}
