@@ -31,6 +31,7 @@
                 <th>Role</th>
                 <th>Address</th>
                 <th>Password</th>
+                <th>Tree Amount</th>
             </tr> 
             <c:forEach var="users" items="${listUser}">
                 <tr style="text-align:center">
@@ -43,6 +44,7 @@
 			        <td><c:out value="${users.role}" /></td>
                     <td><c:out value="${users.adress_street_num} ${users.adress_street} ${users.adress_city} ${users.adress_state} ${users.adress_zip_code}" /></td>
                     <td><c:out value="${users.password}" /></td>
+                    <td><c:out value="${users.tree_amt}" /></td>
 
             </c:forEach>
         </table>

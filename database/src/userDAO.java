@@ -99,11 +99,16 @@ public class userDAO
             String adress_street = resultSet.getString("adress_street"); 
             String adress_city = resultSet.getString("adress_city"); 
             String adress_state = resultSet.getString("adress_state"); 
-            String adress_zip_code = resultSet.getString("adress_zip_code"); 
+            String adress_zip_code = resultSet.getString("adress_zip_code");
+            String tree_amt = resultSet.getString("tree_amt");
+            String tree_size = resultSet.getString("tree_size");
+            String tree_height = resultSet.getString("tree_height");
+            String tree_distance = resultSet.getString("tree_distance");
+            String tree_location = resultSet.getString("tree_location");
 
 
              
-            user users = new user(id, email,firstName, lastName, password, creditCardNumber,phoneNumber,role, adress_street_num,  adress_street,  adress_city,  adress_state,  adress_zip_code);
+            user users = new user(id, email,firstName, lastName, password, creditCardNumber,phoneNumber,role, adress_street_num,  adress_street,  adress_city,  adress_state,  adress_zip_code, tree_amt, tree_size, tree_height, tree_distance, tree_location);
             listUser.add(users);
         }        
         resultSet.close();
@@ -120,7 +125,7 @@ public class userDAO
     
     public void insert(user users) throws SQLException {
     	connect_func("root","pass1234");         
-		String sql = "insert into User(email, firstName, lastName, password, creditCardNumber, phoneNumber, role,adress_street_num, adress_street,adress_city,adress_state,adress_zip_code) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,? ,?)";
+		String sql = "insert into User(email, firstName, lastName, password, creditCardNumber, phoneNumber, role,adress_street_num, adress_street,adress_city,adress_state,adress_zip_code,tree_amt,tree_size_tree_height,tree_distance,tree_location) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? ,? ,?)";
 		preparedStatement = (PreparedStatement) connect.prepareStatement(sql);
 			preparedStatement.setString(2, users.getEmail());
 			preparedStatement.setString(3, users.getFirstName());
@@ -133,7 +138,12 @@ public class userDAO
 			preparedStatement.setString(10, users.getAdress_street());		
 			preparedStatement.setString(11, users.getAdress_city());		
 			preparedStatement.setString(12, users.getAdress_state());		
-			preparedStatement.setString(13, users.getAdress_zip_code());		
+			preparedStatement.setString(13, users.getAdress_zip_code());	
+			preparedStatement.setString(14, users.getTree_Amt());
+			preparedStatement.setString(15, users.getTree_Size());
+			preparedStatement.setString(16, users.getTree_Height());	
+			preparedStatement.setString(17, users.getTree_Distance());
+			preparedStatement.setString(18, users.getTree_Location());	
 	
 		preparedStatement.executeUpdate();
         preparedStatement.close();
@@ -152,7 +162,7 @@ public class userDAO
     }
      
     public boolean update(user users) throws SQLException {
-        String sql = "update User set firstName=?, lastName =?,password = ?, creditCardNumber=?, phoneNumber=?, role=?, adress_street_num =?, adress_street=?,adress_city=?,adress_state=?,adress_zip_code=? where email = ?";
+        String sql = "update User set firstName=?, lastName =?,password = ?, creditCardNumber=?, phoneNumber=?, role=?, adress_street_num =?, adress_street=?,adress_city=?,adress_state=?,adress_zip_code=?, tree_amt=?, tree_size=?, tree_height=?, tree_distance=?, tree_location=?, where email = ?";
         connect_func();
         
 		preparedStatement.setString(2, users.getEmail());
@@ -166,7 +176,13 @@ public class userDAO
 		preparedStatement.setString(10, users.getAdress_street());		
 		preparedStatement.setString(11, users.getAdress_city());		
 		preparedStatement.setString(12, users.getAdress_state());		
-		preparedStatement.setString(13, users.getAdress_zip_code());			
+		preparedStatement.setString(13, users.getAdress_zip_code());	
+		preparedStatement.setString(14, users.getTree_Amt());
+		preparedStatement.setString(15, users.getTree_Size());
+		preparedStatement.setString(16, users.getTree_Height());
+		preparedStatement.setString(17, users.getTree_Distance());
+		preparedStatement.setString(18, users.getTree_Location());
+		
 		
          
         boolean rowUpdated = preparedStatement.executeUpdate() > 0;
@@ -186,6 +202,7 @@ public class userDAO
         ResultSet resultSet = preparedStatement.executeQuery();
          
         if (resultSet.next()) {
+        	String id = resultSet.getString("id");
             String firstName = resultSet.getString("firstName");
             String lastName = resultSet.getString("lastName");
             String password = resultSet.getString("password");
@@ -197,7 +214,12 @@ public class userDAO
             String adress_city = resultSet.getString("adress_city"); 
             String adress_state = resultSet.getString("adress_state"); 
             String adress_zip_code = resultSet.getString("adress_zip_code"); 
-            user = new user(null, email, firstName, lastName, password, creditCardNumber, phoneNumber, role, adress_street_num,  adress_street,  adress_city,  adress_state,  adress_zip_code);
+            String tree_amt = resultSet.getString("tree_amt");
+            String tree_size = resultSet.getString("tree_size");
+            String tree_height = resultSet.getString("tree_height");
+            String tree_distance = resultSet.getString("tree_distance");
+            String tree_location = resultSet.getString("tree_location");
+            user = new user(id, email, firstName, lastName, password, creditCardNumber, phoneNumber, role, adress_street_num,  adress_street,  adress_city,  adress_state,  adress_zip_code, tree_amt, tree_size, tree_height, tree_distance, tree_location);
         }
          
         resultSet.close();
@@ -289,20 +311,26 @@ public class userDAO
 					            "adress_city VARCHAR(20)," + 
 					            "adress_state VARCHAR(2),"+ 
 					            "adress_zip_code VARCHAR(5),"+ 
+					            "tree_amt VARCHAR(3),"+
+					            "tree_size VARCHAR(3),"+
+					            "tree_height VARCHAR(3),"+
+					            "tree_distance VARCHAR(3),"+
+					            "tree_location VARCHAR(20),"+
 					            "PRIMARY KEY (email) "+"); ")
         					};
-        String[] TUPLES = {("insert into User(id, email, firstName, lastName, password, creditCardNumber, phoneNumber, role, adress_street_num, adress_street, adress_city, adress_state, adress_zip_code)"+
-        			"values (id,'root', 'default', 'default','pass1234', '1234-3456-4567-5678','123-234-4567', 'root', '0000', 'Default', 'Default', '0', '00000'),"+
-			    		 	"(id,'don@gmail.com', 'Don', 'Cummings','don123', '4972-9215-7861-2529','453-921-1233', 'Client', '1000', 'hi street', 'mama', 'MO', '12345'),"+
-			    	 	 	"(id,'margarita@gmail.com', 'Margarita', 'Lawson','margarita1234', '0551-1797-8053-2646','281-966-2201', 'Client', '1234', 'ivan street', 'tata','CO','12561'),"+
-			    		 	"(id,'jo@gmail.com', 'Jo', 'Brady','jo1234', '1558-7516-4276-7312','121-717-1085', 'Client', '3214','marko street', 'brat', 'DU', '54321'),"+
-			    		 	"(id,'wallace@gmail.com', 'Wallace', 'Moore','wallace1234', '7798-1489-2513-1024','859-738-0661', 'Client', '4500', 'frey street', 'sestra', 'MI', '48202'),"+
-			    		 	"(id,'amelia@gmail.com', 'Amelia', 'Phillips','amelia1234', '3939-6766-6025-7909','157-417-5433', 'Client', '1245', 'm8s street', 'baka', 'IL', '48000'),"+
-			    			"(id,'sophie@gmail.com', 'Sophie', 'Pierce','sophie1234', '2821-0436-9879-0137','814-722-1464', 'Client', '2468', 'yolos street', 'ides', 'CM', '24680'),"+
-			    			"(id,'angelo@gmail.com', 'Angelo', 'Francis','angelo1234', '8275-0022-7017-0368','767-805-6058', 'Client', '4680', 'egypt street', 'lolas', 'DT', '13579'),"+
-			    			"(id,'rudy@gmail.com', 'Rudy', 'Smith','rudy1234', '0860-6191-8026-5295','408-200-2252', 'Client', '1234', 'sign street', 'samo ne tu','MH', '09876'),"+
-			    			"(id,'jeannette@gmail.com', 'Jeannette ', 'Stone','jeannette1234', '7738-9880-5284-3227','606-059-0950', 'Client', '0981', 'snoop street', 'kojik', 'HW', '87654'),"+
-			    			"(id, 'susie@gmail.com', 'Susie ', 'Guzman', 'susie1234', '2038-7418-0996-1404','215-638-3029', 'Client', '1234', 'whatever street', 'detroit', 'MI', '48202');")
+        String[] TUPLES = {("insert into User(id, email, firstName, lastName, password, creditCardNumber, phoneNumber, role, adress_street_num, adress_street, adress_city, adress_state, adress_zip_code , tree_amt, tree_size, tree_height, tree_distance, tree_location)"+
+        			"values (id,'root', 'default', 'default','pass1234', '1234-3456-4567-5678','123-234-4567', 'root', '0000', 'Default', 'Default', '0', '00000' , '0', '0', '0', '0', '0'),"+
+        					"(id,'davidsmith@gmail.com', 'David', 'Smith','david1234', '0000-0000-0000-0000','000-000-0000', 'David Smith', '0000', 'Default', 'Default', '0', '00000', '0', '0', '0', '0', '0')," +
+			    		 	"(id,'don@gmail.com', 'Don', 'Cummings','don1234', '4972-9215-7861-2529','453-921-1233', 'Client', '1000', 'hi street', 'mama', 'MO', '12345', '0', '0', '0', '0', '0'),"+
+			    	 	 	"(id,'margarita@gmail.com', 'Margarita', 'Lawson','margarita1234', '0551-1797-8053-2646','281-966-2201', 'Client', '1234', 'ivan street', 'tata','CO','12561', '0', '0', '0', '0', '0'),"+
+			    		 	"(id,'jo@gmail.com', 'Jo', 'Brady','jo1234', '1558-7516-4276-7312','121-717-1085', 'Client', '3214','marko street', 'brat', 'DU', '54321', '0', '0', '0', '0', '0'),"+
+			    		 	"(id,'wallace@gmail.com', 'Wallace', 'Moore','wallace1234', '7798-1489-2513-1024','859-738-0661', 'Client', '4500', 'frey street', 'sestra', 'MI', '48202', '0', '0', '0', '0', '0'),"+
+			    		 	"(id,'amelia@gmail.com', 'Amelia', 'Phillips','amelia1234', '3939-6766-6025-7909','157-417-5433', 'Client', '1245', 'm8s street', 'baka', 'IL', '48000', '0', '0', '0', '0', '0'),"+
+			    			"(id,'sophie@gmail.com', 'Sophie', 'Pierce','sophie1234', '2821-0436-9879-0137','814-722-1464', 'Client', '2468', 'yolos street', 'ides', 'CM', '24680', '0', '0', '0', '0', '0'),"+
+			    			"(id,'angelo@gmail.com', 'Angelo', 'Francis','angelo1234', '8275-0022-7017-0368','767-805-6058', 'Client', '4680', 'egypt street', 'lolas', 'DT', '13579', '0', '0', '0', '0', '0'),"+
+			    			"(id,'rudy@gmail.com', 'Rudy', 'Smith','rudy1234', '0860-6191-8026-5295','408-200-2252', 'Client', '1234', 'sign street', 'samo ne tu','MH', '09876', '0', '0', '0', '0', '0'),"+
+			    			"(id,'jeannette@gmail.com', 'Jeannette ', 'Stone','jeannette1234', '7738-9880-5284-3227','606-059-0950', 'Client', '0981', 'snoop street', 'kojik', 'HW', '87654', '0', '0', '0', '0', '0'),"+
+			    			"(id, 'susie@gmail.com', 'Susie ', 'Guzman', 'susie1234', '2038-7418-0996-1404','215-638-3029', 'Client', '1234', 'whatever street', 'detroit', 'MI', '48202', '0', '0', '0', '0', '0');")
 			    			};
         
         //for loop to put these in database

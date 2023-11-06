@@ -94,6 +94,12 @@ public class ControlServlet extends HttpServlet {
 	    	request.getRequestDispatcher("rootView.jsp").forward(request, response);
 	    }
 	    
+	    private void davidSmithPage(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException{
+	    	System.out.println("David Smith Dashboard");
+	    	request.setAttribute("listUser", userDAO.listAllUsers());
+	    	request.getRequestDispatcher("davidSmithDashboard.jsp").forward(request, response);
+	    }
+	    
 	    
 	    protected void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
 	    	 String email = request.getParameter("email");
@@ -105,6 +111,13 @@ public class ControlServlet extends HttpServlet {
 				 session.setAttribute("username", email);
 				 rootPage(request, response, "");
 	    	 }
+	    	 
+	    	 else if(email.equals("davidsmith@gmail.com") && password.equals("david1234"))
+	    	 {
+	    		 System.out.println("Welcome David Smith! Redirecing to your dashboard");
+	    		 request.getRequestDispatcher("davidSmithDashboard.jsp").forward(request, response);
+	    	 }
+	    	 
 	    	 else if(userDAO.isValid(email, password)) 
 	    	 {
 			 	 
@@ -132,13 +145,18 @@ public class ControlServlet extends HttpServlet {
 	   	 	String adress_street = request.getParameter("adress_street"); 
 	   	 	String adress_city = request.getParameter("adress_city"); 
 	   	 	String adress_state = request.getParameter("adress_state"); 
-	   	 	String adress_zip_code = request.getParameter("adress_zip_code"); 	   	 	
+	   	 	String adress_zip_code = request.getParameter("adress_zip_code"); 	 
+	   	 	String tree_amt = "0";
+	   	 	String tree_size = "0";
+	   	 	String tree_height = "0";
+	   	 	String tree_distance = "0";
+	   	 	String tree_location = "NULL";
 	   	 	String confirm = request.getParameter("confirmation");
 	   	 	
 	   	 	if (password.equals(confirm)) {
 	   	 		if (!userDAO.checkEmail(email)) {
 		   	 		System.out.println("Registration Successful! Added to database");
-		            user users = new user(id, email,firstName, lastName, password, creditCardNumber, phoneNumber, role, adress_street_num,  adress_street,  adress_city,  adress_state,  adress_zip_code);
+		            user users = new user(id, email,firstName, lastName, password, creditCardNumber, phoneNumber, role, adress_street_num,  adress_street,  adress_city,  adress_state,  adress_zip_code, tree_amt, tree_size, tree_height, tree_distance, tree_location);
 		   	 		userDAO.insert(users);
 		   	 		response.sendRedirect("login.jsp");
 	   	 		}
@@ -154,6 +172,7 @@ public class ControlServlet extends HttpServlet {
 	   		 request.getRequestDispatcher("register.jsp").forward(request, response);
 	   	 	}
 	    }    
+	    
 	    private void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	    	currentUser = "";
         		response.sendRedirect("login.jsp");
