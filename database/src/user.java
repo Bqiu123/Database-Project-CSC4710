@@ -142,10 +142,10 @@ public class user
 	        this.adress_zip_code = adress_zip_code;
 	    }
 	    
-	    public String getTree_Amt() {
+	    public String getTree_amt() {
 	        return tree_amt;
 	    }
-	    public void setTree_Amt(String tree_amt) {
+	    public void setTree_amt(String tree_amt) {
 	        this.tree_amt = tree_amt;
 	    }
 	    public String getTree_Size() {
