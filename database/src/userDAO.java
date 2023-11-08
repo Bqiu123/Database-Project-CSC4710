@@ -125,25 +125,25 @@ public class userDAO
     
     public void insert(user users) throws SQLException {
     	connect_func("root","pass1234");         
-		String sql = "insert into User(email, firstName, lastName, password, creditCardNumber, phoneNumber, role,adress_street_num, adress_street,adress_city,adress_state,adress_zip_code,tree_amt,tree_size_tree_height,tree_distance,tree_location) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? ,? ,?)";
+		String sql = "insert into User(email, firstName, lastName, password, creditCardNumber, phoneNumber, role, adress_street_num, adress_street, adress_city, adress_state, adress_zip_code, tree_amt, tree_size, tree_height, tree_distance, tree_location) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? ,? ,?)";
 		preparedStatement = (PreparedStatement) connect.prepareStatement(sql);
-			preparedStatement.setString(2, users.getEmail());
-			preparedStatement.setString(3, users.getFirstName());
-			preparedStatement.setString(4, users.getLastName());
-			preparedStatement.setString(5, users.getPassword());
-			preparedStatement.setString(6, users.getCreditCardNumber());
-			preparedStatement.setString(7, users.getPhoneNumber());
-			preparedStatement.setString(8, users.getRole());
-			preparedStatement.setString(9, users.getAdress_street_num());		
-			preparedStatement.setString(10, users.getAdress_street());		
-			preparedStatement.setString(11, users.getAdress_city());		
-			preparedStatement.setString(12, users.getAdress_state());		
-			preparedStatement.setString(13, users.getAdress_zip_code());	
-			preparedStatement.setString(14, users.getTree_Amt());
-			preparedStatement.setString(15, users.getTree_Size());
-			preparedStatement.setString(16, users.getTree_Height());	
-			preparedStatement.setString(17, users.getTree_Distance());
-			preparedStatement.setString(18, users.getTree_Location());	
+			preparedStatement.setString(1, users.getEmail());
+			preparedStatement.setString(2, users.getFirstName());
+			preparedStatement.setString(3, users.getLastName());
+			preparedStatement.setString(4, users.getPassword());
+			preparedStatement.setString(5, users.getCreditCardNumber());
+			preparedStatement.setString(6, users.getPhoneNumber());
+			preparedStatement.setString(7, users.getRole());
+			preparedStatement.setString(8, users.getAdress_street_num());		
+			preparedStatement.setString(9, users.getAdress_street());		
+			preparedStatement.setString(10, users.getAdress_city());		
+			preparedStatement.setString(11, users.getAdress_state());		
+			preparedStatement.setString(12, users.getAdress_zip_code());	
+			preparedStatement.setString(13, users.getTree_amt());
+			preparedStatement.setString(14, users.getTree_Size());
+			preparedStatement.setString(15, users.getTree_Height());	
+			preparedStatement.setString(16, users.getTree_Distance());
+			preparedStatement.setString(17, users.getTree_Location());	
 	
 		preparedStatement.executeUpdate();
         preparedStatement.close();
@@ -177,7 +177,7 @@ public class userDAO
 		preparedStatement.setString(11, users.getAdress_city());		
 		preparedStatement.setString(12, users.getAdress_state());		
 		preparedStatement.setString(13, users.getAdress_zip_code());	
-		preparedStatement.setString(14, users.getTree_Amt());
+		preparedStatement.setString(14, users.getTree_amt());
 		preparedStatement.setString(15, users.getTree_Size());
 		preparedStatement.setString(16, users.getTree_Height());
 		preparedStatement.setString(17, users.getTree_Distance());
@@ -288,6 +288,14 @@ public class userDAO
     	return false;
     }
     
+    public boolean checkPhoneNumber(String phoneNumber) throws SQLException {
+        String sql = "SELECT * FROM User WHERE phoneNumber = ?";
+        connect_func();
+        preparedStatement = (PreparedStatement) connect.prepareStatement(sql);
+        preparedStatement.setString(1, phoneNumber);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        return resultSet.next();
+    }
     
     public void init() throws SQLException, FileNotFoundException, IOException{
     	connect_func();
