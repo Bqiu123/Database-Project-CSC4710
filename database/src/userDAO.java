@@ -304,8 +304,10 @@ public class userDAO
         String[] INITIAL = {"drop database if exists testdb; ",
 					        "create database testdb; ",
 					        "use testdb; ",
+					        "drop table if exists Tree;",
+					        "drop table if exists Quote",
 					        "drop table if exists User; ",
-					        ("CREATE TABLE if not exists User( " + 
+					        "CREATE TABLE if not exists User( " + 
 					        	"id INT AUTO_INCREMENT UNIQUE, " +
 					            "email VARCHAR(50) NOT NULL, " + 
 					            "firstName VARCHAR(10) NOT NULL, " +
@@ -324,7 +326,24 @@ public class userDAO
 					            "tree_height VARCHAR(3),"+
 					            "tree_distance VARCHAR(3),"+
 					            "tree_location VARCHAR(20),"+
-					            "PRIMARY KEY (email) "+"); ")
+					            "PRIMARY KEY (email) "+"); ",
+					        "CREATE TABLE if not exists Quote(" +
+					        	"quoteID INT AUTO_INCREMENT PRIMARY KEY, " +
+					            "initialPrice FLOAT NOT NULL, " +
+					            "timeWindow VARCHAR(255) NOT NULL, " +
+					            "status VARCHAR(50) NOT NULL, " +
+					            "clientID INT, " +
+					            "FOREIGN KEY (clientID) REFERENCES User(id) " +
+					         ");",
+					         "CREATE TABLE if not exists Tree( " +
+					            "treeID INT AUTO_INCREMENT PRIMARY KEY, " +
+					            "size FLOAT NOT NULL, " +
+					            "height FLOAT NOT NULL, " +
+					            "location VARCHAR(255) NOT NULL, " +
+					            "proximityToHouse FLOAT NOT NULL, " +
+					            "quoteID INT, " +
+					            "FOREIGN KEY (quoteID) REFERENCES Quote(quoteID) " +
+					          ");"
         					};
         String[] TUPLES = {("insert into User(id, email, firstName, lastName, password, creditCardNumber, phoneNumber, role, adress_street_num, adress_street, adress_city, adress_state, adress_zip_code , tree_amt, tree_size, tree_height, tree_distance, tree_location)"+
         			"values (id,'root', 'default', 'default','pass1234', '1234-3456-4567-5678','123-234-4567', 'root', '0000', 'Default', 'Default', '0', '00000' , '0', '0', '0', '0', '0'),"+
