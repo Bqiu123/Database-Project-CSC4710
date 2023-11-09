@@ -147,11 +147,6 @@ public class ControlServlet extends HttpServlet {
 	   	 	String adress_city = request.getParameter("adress_city"); 
 	   	 	String adress_state = request.getParameter("adress_state"); 
 	   	 	String adress_zip_code = request.getParameter("adress_zip_code"); 	 
-	   	 	String tree_amt = "0";
-	   	 	String tree_size = "0";
-	   	 	String tree_height = "0";
-	   	 	String tree_distance = "0";
-	   	 	String tree_location = "NULL";
 	   	 	String confirm = request.getParameter("confirmation");
 	   	 	
 	   	 Pattern namePattern = Pattern.compile("^[a-zA-Z]+$");
@@ -191,7 +186,7 @@ public class ControlServlet extends HttpServlet {
 			   	 }
 	   	 		if (!userDAO.checkEmail(email)) {
 		   	 		System.out.println("Registration Successful! Added to database");
-		            user users = new user(id, email,firstName, lastName, password, creditCardNumber, phoneNumber, role, adress_street_num,  adress_street,  adress_city,  adress_state,  adress_zip_code, tree_amt, tree_size, tree_height, tree_distance, tree_location);
+		            user users = new user(id, email,firstName, lastName, password, creditCardNumber, phoneNumber, role, adress_street_num,  adress_street,  adress_city,  adress_state,  adress_zip_code);
 		   	 		userDAO.insert(users);
 		   	 		response.sendRedirect("login.jsp");
 	   	 		}
