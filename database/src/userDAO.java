@@ -328,12 +328,13 @@ public class userDAO
     	PreparedStatement preparedStatement = null;
     	try {
         	connect_func("root", "pass1234");
-        	String sql= "insert into Quote(initialPrice, timeWindow, status, clientID) values (?, ?, ?, ?)";
+        	String sql= "insert into Quote(initialPrice, timeWindow, status, clientID, contractorID) values (?, ?, ?, ?, ?)";
         	preparedStatement = (PreparedStatement) connect.prepareStatement(sql);
         	preparedStatement.setString(1, quote.getInitialPrice());
         	preparedStatement.setString(2, quote.getTimeWindow());
         	preparedStatement.setString(3, quote.getStatus());
         	preparedStatement.setString(4, quote.getClientID());
+        	preparedStatement.setString(5, quote.getContractorID());
         	
         	preparedStatement.executeUpdate();
     	}catch (SQLException e) {
@@ -359,8 +360,9 @@ public class userDAO
     		String timeWindow = resultSet.getString("timeWindow");
     		String status = resultSet.getString("status");
     		String clientID = resultSet.getString("clientID");
+    		String contractorID = resultSet.getString("contractorID");
     		
-    		Quote quote = new Quote(quoteID, initialPrice, timeWindow, status, clientID);
+    		Quote quote = new Quote(quoteID, initialPrice, timeWindow, status, clientID, contractorID);
     		listQuote.add(quote);
     	}
     	resultSet.close();
@@ -383,9 +385,10 @@ public class userDAO
     		String initialPrice = resultSet.getString("intialPrice");
     		String timeWindow = resultSet.getString("timeWindow");
     		String status = resultSet.getString("status");
-    		String client = resultSet.getString("client");
+    		String clientID = resultSet.getString("clientID");
+    		String contractorID = resultSet.getString("contractorID");
     		
-    		quote = new Quote(quoteID, initialPrice, timeWindow, status, client);
+    		quote = new Quote(quoteID, initialPrice, timeWindow, status, clientID, contractorID);
     		
     	}
     	resultSet.close();
@@ -396,13 +399,14 @@ public class userDAO
     
     public boolean updateQuote(Quote quote) throws SQLException{
     	PreparedStatement preparedStatement = null;
-    	String sql = "update Quote set initialPrice = ?, timeWindow = ?,status = ?, clientID = ?, where quoteID = ?";
+    	String sql = "update Quote set initialPrice = ?, timeWindow = ?,status = ?, clientID = ?,contractorID = ?, where quoteID = ?";
     	connect_func();
     	preparedStatement = connect.prepareStatement(sql);
     	preparedStatement.setString(1, quote.getInitialPrice());
     	preparedStatement.setString(2, quote.getTimeWindow());
     	preparedStatement.setString(3, quote.getStatus());
     	preparedStatement.setString(4, quote.getClientID());
+    	preparedStatement.setString(5, quote.getContractorID());
     	
     	boolean rowUpdated = preparedStatement.executeUpdate() > 0;
     	preparedStatement.close();
@@ -420,6 +424,609 @@ public class userDAO
     	preparedStatement.close();
     	return rowDeleted;
     }
+    
+   //----------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+    // CRUD methods for QuoteMessages
+
+    // Create (Insert)
+    public void insertQuoteMessage(QuoteMessages quoteMessage) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        try {
+            connect_func(); 
+            String sql = "INSERT INTO QuoteMessages (userID, quoteID, msgTime, price, scheduleStart, scheduleEnd, note) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            preparedStatement = connect.prepareStatement(sql);
+
+            preparedStatement.setString(1, quoteMessage.getUserID());
+            preparedStatement.setString(2, quoteMessage.getQuoteID());
+            preparedStatement.setString(3, quoteMessage.getMsgTime());
+            preparedStatement.setString(4, quoteMessage.getPrice());
+            preparedStatement.setString(5, quoteMessage.getScheduleStart());
+            preparedStatement.setString(6, quoteMessage.getScheduleEnd());
+            preparedStatement.setString(7, quoteMessage.getNote());
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+    }
+
+    // Read (List All)
+    public List<QuoteMessages> listAllQuoteMessages() throws SQLException {
+        List<QuoteMessages> listQuoteMessage = new ArrayList<>();
+        Statement statement = null;
+        ResultSet resultSet = null;
+        try {
+            connect_func();
+            String sql = "SELECT * FROM QuoteMessages";
+            statement = connect.createStatement();
+            resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                String quoteMessageID = resultSet.getString("quoteMessageID");
+                String userID = resultSet.getString("userID");
+                String quoteID = resultSet.getString("quoteID");
+                String msgTime = resultSet.getString("msgTime");
+                String price = resultSet.getString("price");
+                String scheduleStart = resultSet.getString("scheduleStart");
+                String scheduleEnd = resultSet.getString("scheduleEnd");
+                String note = resultSet.getString("note");
+
+                QuoteMessages quoteMessage = new QuoteMessages(quoteMessageID, userID, quoteID, msgTime, price, scheduleStart, scheduleEnd, note);
+                listQuoteMessage.add(quoteMessage);
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (statement != null) {
+                statement.close();
+            }
+        }
+        return listQuoteMessage;
+    }
+
+    // Read (Get One)
+    public QuoteMessages getQuoteMessage(String quoteMessageID) throws SQLException {
+        QuoteMessages quoteMessage = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            connect_func(); 
+            String sql = "SELECT * FROM QuoteMessages WHERE quoteMessageID = ?";
+
+            preparedStatement = connect.prepareStatement(sql);
+            preparedStatement.setString(1, quoteMessageID);
+
+            resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String userID = resultSet.getString("userID");
+                String quoteID = resultSet.getString("quoteID");
+                String msgTime = resultSet.getString("msgTime");
+                String price = resultSet.getString("price");
+                String scheduleStart = resultSet.getString("scheduleStart");
+                String scheduleEnd = resultSet.getString("scheduleEnd");
+                String note = resultSet.getString("note");
+
+                quoteMessage = new QuoteMessages(quoteMessageID, userID, quoteID, msgTime, price, scheduleStart, scheduleEnd, note);
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+        return quoteMessage;
+    }
+
+    // Update
+    public boolean updateQuoteMessage(QuoteMessages quoteMessage) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        try {
+            connect_func(); 
+            String sql = "UPDATE QuoteMessages SET userID = ?, quoteID = ?, msgTime = ?, price = ?, scheduleStart = ?, scheduleEnd = ?, note = ? WHERE quoteMessageID = ?";
+
+            preparedStatement = connect.prepareStatement(sql);
+
+            preparedStatement.setString(1, quoteMessage.getUserID());
+            preparedStatement.setString(2, quoteMessage.getQuoteID());
+            preparedStatement.setString(3, quoteMessage.getMsgTime());
+            preparedStatement.setString(4, quoteMessage.getPrice());
+            preparedStatement.setString(5, quoteMessage.getScheduleStart());
+            preparedStatement.setString(6, quoteMessage.getScheduleEnd());
+            preparedStatement.setString(7, quoteMessage.getNote());
+            preparedStatement.setString(8, quoteMessage.getQuoteMessageID());
+
+            int rowsUpdated = preparedStatement.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+    }
+
+    // Delete
+    public boolean deleteQuoteMessage(String quoteMessageID) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        try {
+            connect_func();
+            String sql = "DELETE FROM QuoteMessages WHERE quoteMessageID = ?";
+
+            preparedStatement = connect.prepareStatement(sql);
+            preparedStatement.setString(1, quoteMessageID);
+
+            int rowsDeleted = preparedStatement.executeUpdate();
+            return rowsDeleted > 0;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+    }
+
+    
+ // CRUD methods for Bills
+
+    // Create (Insert)
+    public void insertBill(Bills bill) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        try {
+            connect_func();
+            String sql = "INSERT INTO Bills (orderID, price, discount, balance, status) VALUES (?, ?, ?, ?, ?)";
+            preparedStatement = connect.prepareStatement(sql);
+
+            preparedStatement.setString(1, bill.getOrderID());
+            preparedStatement.setString(2, bill.getPrice());
+            preparedStatement.setString(3, bill.getDiscount());
+            preparedStatement.setString(4, bill.getBalance());
+            preparedStatement.setString(5, bill.getStatus());
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+    }
+
+    // Read (List All)
+    public List<Bills> listAllBills() throws SQLException {
+        List<Bills> listBills = new ArrayList<>();
+        Statement statement = null;
+        ResultSet resultSet = null;
+        try {
+            connect_func(); 
+            String sql = "SELECT * FROM Bills";
+            statement = connect.createStatement();
+            resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                String billID = resultSet.getString("billID");
+                String orderID = resultSet.getString("orderID");
+                String price = resultSet.getString("price");
+                String discount = resultSet.getString("discount");
+                String balance = resultSet.getString("balance");
+                String status = resultSet.getString("status");
+
+                Bills bill = new Bills(billID, orderID, price, discount, balance, status);
+                listBills.add(bill);
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (statement != null) {
+                statement.close();
+            }
+        }
+        return listBills;
+    }
+
+    // Read (Get One)
+    public Bills getBill(String billID) throws SQLException {
+        Bills bill = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            connect_func(); 
+            String sql = "SELECT * FROM Bills WHERE billID = ?";
+
+            preparedStatement = connect.prepareStatement(sql);
+            preparedStatement.setString(1, billID);
+
+            resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String orderID = resultSet.getString("orderID");
+                String price = resultSet.getString("price");
+                String discount = resultSet.getString("discount");
+                String balance = resultSet.getString("balance");
+                String status = resultSet.getString("status");
+
+                bill = new Bills(billID, orderID, price, discount, balance, status);
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+        return bill;
+    }
+
+    // Update
+    public boolean updateBill(Bills bill) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        try {
+            connect_func();
+            String sql = "UPDATE Bills SET orderID = ?, price = ?, discount = ?, balance = ?, status = ? WHERE billID = ?";
+
+            preparedStatement = connect.prepareStatement(sql);
+
+            preparedStatement.setString(1, bill.getOrderID());
+            preparedStatement.setString(2, bill.getPrice());
+            preparedStatement.setString(3, bill.getDiscount());
+            preparedStatement.setString(4, bill.getBalance());
+            preparedStatement.setString(5, bill.getStatus());
+            preparedStatement.setString(6, bill.getBillID());
+
+            int rowsUpdated = preparedStatement.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+    }
+
+    // Delete
+    public boolean deleteBill(String billID) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        try {
+            connect_func(); 
+            String sql = "DELETE FROM Bills WHERE billID = ?";
+
+            preparedStatement = connect.prepareStatement(sql);
+            preparedStatement.setString(1, billID);
+
+            int rowsDeleted = preparedStatement.executeUpdate();
+            return rowsDeleted > 0;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+    }
+
+    
+ // CRUD methods for Order
+
+    // Create (Insert)
+    public void insertOrder(Order order) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        try {
+            connect_func(); 
+            String sql = "INSERT INTO Order (quoteID, price, scheduleStart, scheduleEnd) VALUES (?, ?, ?, ?)";
+            preparedStatement = connect.prepareStatement(sql);
+
+            preparedStatement.setString(1, order.getQuoteID());
+            preparedStatement.setString(2, order.getPrice());
+            preparedStatement.setString(3, order.getScheduleStart());
+            preparedStatement.setString(4, order.getScheduleEnd());
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+    }
+
+    // Read (List All)
+    public List<Order> listAllOrders() throws SQLException {
+        List<Order> listOrders = new ArrayList<>();
+        Statement statement = null;
+        ResultSet resultSet = null;
+        try {
+            connect_func(); 
+            String sql = "SELECT * FROM Order";
+            statement = connect.createStatement();
+            resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                String orderID = resultSet.getString("orderID");
+                String quoteID = resultSet.getString("quoteID");
+                String price = resultSet.getString("price");
+                String scheduleStart = resultSet.getString("scheduleStart");
+                String scheduleEnd = resultSet.getString("scheduleEnd");
+
+                Order order = new Order(orderID, quoteID, price, scheduleStart, scheduleEnd);
+                listOrders.add(order);
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (statement != null) {
+                statement.close();
+            }
+        }
+        return listOrders;
+    }
+
+    // Read (Get One)
+    public Order getOrder(String orderID) throws SQLException {
+        Order order = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            connect_func(); 
+            String sql = "SELECT * FROM Order WHERE orderID = ?";
+
+            preparedStatement = connect.prepareStatement(sql);
+            preparedStatement.setString(1, orderID);
+
+            resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String quoteID = resultSet.getString("quoteID");
+                String price = resultSet.getString("price");
+                String scheduleStart = resultSet.getString("scheduleStart");
+                String scheduleEnd = resultSet.getString("scheduleEnd");
+
+                order = new Order(orderID, quoteID, price, scheduleStart, scheduleEnd);
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+        return order;
+    }
+
+    // Update
+    public boolean updateOrder(Order order) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        try {
+            connect_func(); 
+            String sql = "UPDATE Order SET quoteID = ?, price = ?, scheduleStart = ?, scheduleEnd = ? WHERE orderID = ?";
+
+            preparedStatement = connect.prepareStatement(sql);
+
+            preparedStatement.setString(1, order.getQuoteID());
+            preparedStatement.setString(2, order.getPrice());
+            preparedStatement.setString(3, order.getScheduleStart());
+            preparedStatement.setString(4, order.getScheduleEnd());
+            preparedStatement.setString(5, order.getOrderID());
+
+            int rowsUpdated = preparedStatement.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+    }
+
+    // Delete
+    public boolean deleteOrder(String orderID) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        try {
+            connect_func(); 
+            String sql = "DELETE FROM Order WHERE orderID = ?";
+
+            preparedStatement = connect.prepareStatement(sql);
+            preparedStatement.setString(1, orderID);
+
+            int rowsDeleted = preparedStatement.executeUpdate();
+            return rowsDeleted > 0;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+    }
+ 
+    
+ // CRUD methods for BillMessages
+
+    // Create (Insert)
+    public void insertBillMessage(BillMessages billMessage) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        try {
+            connect_func(); 
+            String sql = "INSERT INTO BillMessages (userID, billID, msgTime, price, scheduleStart, scheduleEnd, note) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            preparedStatement = connect.prepareStatement(sql);
+
+            preparedStatement.setString(1, billMessage.getUserID());
+            preparedStatement.setString(2, billMessage.getBillID());
+            preparedStatement.setString(3, billMessage.getMsgTime());
+            preparedStatement.setString(4, billMessage.getPrice());
+            preparedStatement.setString(5, billMessage.getScheduleStart());
+            preparedStatement.setString(6, billMessage.getScheduleEnd());
+            preparedStatement.setString(7, billMessage.getNote());
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+    }
+
+    // Read (List All)
+    public List<BillMessages> listAllBillMessages() throws SQLException {
+        List<BillMessages> listBillMessages = new ArrayList<>();
+        Statement statement = null;
+        ResultSet resultSet = null;
+        try {
+            connect_func(); 
+            String sql = "SELECT * FROM BillMessages";
+            statement = connect.createStatement();
+            resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                String billMessageID = resultSet.getString("billMessageID");
+                String userID = resultSet.getString("userID");
+                String billID = resultSet.getString("billID");
+                String msgTime = resultSet.getString("msgTime");
+                String price = resultSet.getString("price");
+                String scheduleStart = resultSet.getString("scheduleStart");
+                String scheduleEnd = resultSet.getString("scheduleEnd");
+                String note = resultSet.getString("note");
+
+                BillMessages billMessage = new BillMessages(billMessageID, userID, billID, msgTime, price, scheduleStart, scheduleEnd, note);
+                listBillMessages.add(billMessage);
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (statement != null) {
+                statement.close();
+            }
+        }
+        return listBillMessages;
+    }
+
+    // Read (Get One)
+    public BillMessages getBillMessage(String billMessageID) throws SQLException {
+        BillMessages billMessage = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            connect_func(); 
+            String sql = "SELECT * FROM BillMessages WHERE billMessageID = ?";
+
+            preparedStatement = connect.prepareStatement(sql);
+            preparedStatement.setString(1, billMessageID);
+
+            resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String userID = resultSet.getString("userID");
+                String billID = resultSet.getString("billID");
+                String msgTime = resultSet.getString("msgTime");
+                String price = resultSet.getString("price");
+                String scheduleStart = resultSet.getString("scheduleStart");
+                String scheduleEnd = resultSet.getString("scheduleEnd");
+                String note = resultSet.getString("note");
+
+                billMessage = new BillMessages(billMessageID, userID, billID, msgTime, price, scheduleStart, scheduleEnd, note);
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+        return billMessage;
+    }
+
+    // Update
+    public boolean updateBillMessage(BillMessages billMessage) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        try {
+            connect_func(); 
+            String sql = "UPDATE BillMessages SET userID = ?, billID = ?, msgTime = ?, price = ?, scheduleStart = ?, scheduleEnd = ?, note = ? WHERE billMessageID = ?";
+
+            preparedStatement = connect.prepareStatement(sql);
+
+            preparedStatement.setString(1, billMessage.getUserID());
+            preparedStatement.setString(2, billMessage.getBillID());
+            preparedStatement.setString(3, billMessage.getMsgTime());
+            preparedStatement.setString(4, billMessage.getPrice());
+            preparedStatement.setString(5, billMessage.getScheduleStart());
+            preparedStatement.setString(6, billMessage.getScheduleEnd());
+            preparedStatement.setString(7, billMessage.getNote());
+            preparedStatement.setString(8, billMessage.getBillMessageID());
+
+            int rowsUpdated = preparedStatement.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+    }
+
+    // Delete
+    public boolean deleteBillMessage(String billMessageID) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        try {
+            connect_func(); 
+            String sql = "DELETE FROM BillMessages WHERE billMessageID = ?";
+
+            preparedStatement = connect.prepareStatement(sql);
+            preparedStatement.setString(1, billMessageID);
+
+            int rowsDeleted = preparedStatement.executeUpdate();
+            return rowsDeleted > 0;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -502,8 +1109,12 @@ public class userDAO
 					        "create database testdb; ",
 					        "use testdb; ",
 					        "drop table if exists Tree;",
-					        "drop table if exists Quote",
+					        "drop table if exists Quote;",
 					        "drop table if exists User; ",
+					        "drop table if exists QuoteMessages;",
+					        "drop table if exists Order;",
+					        "drop table if exists Bills;",
+					        "drop table if exists BillMessages;",
 					        "CREATE TABLE if not exists User( " + 
 					        	"id INT AUTO_INCREMENT UNIQUE, " +
 					            "email VARCHAR(50) NOT NULL, " + 
@@ -518,24 +1129,72 @@ public class userDAO
 					            "adress_city VARCHAR(20)," + 
 					            "adress_state VARCHAR(2),"+ 
 					            "adress_zip_code VARCHAR(5),"+ 
-					            "PRIMARY KEY (email) "+"); ",
+					            "UNIQUE(email),"+
+					            "PRIMARY KEY (id) "+
+					        "); ",
 					        "CREATE TABLE if not exists Quote(" +
 					        	"quoteID INT AUTO_INCREMENT PRIMARY KEY, " +
-					            "initialPrice FLOAT NOT NULL, " +
-					            "timeWindow VARCHAR(255) NOT NULL, " +
-					            "status VARCHAR(50) NOT NULL, " +
+					            "initialPrice DOUBLE, " +
+					            "timeWindow VARCHAR(255), " +
+					            "status VARCHAR(50), " +
 					            "clientID INT, " +
+					            "contractorID INT, "+
+					            "FOREIGN KEY (contractorID) REFERENCES User(id),"+
 					            "FOREIGN KEY (clientID) REFERENCES User(id) " +
 					         ");",
 					         "CREATE TABLE if not exists Tree( " +
 					            "treeID INT AUTO_INCREMENT PRIMARY KEY, " +
-					            "size FLOAT NOT NULL, " +
-					            "height FLOAT NOT NULL, " +
-					            "location VARCHAR(255) NOT NULL, " +
-					            "proximityToHouse FLOAT NOT NULL, " +
+					            "size DOUBLE, " +
+					            "height DOUBLE, " +
+					            "location VARCHAR(255), " +
+					            "proximityToHouse DOUBLE, " +
 					            "quoteID INT, " +
-					            "FOREIGN KEY (quoteID) REFERENCES Quote(quoteID) " +
-					          ");"
+					            "FOREIGN KEY (quoteID) REFERENCES Quote(quoteID)" +
+					         ");",
+					         "CREATE TABLE if not exists QuoteMessages( "+
+					          	"quoteMessageID INT AUTO_INCREMENT PRIMARY KEY, "+
+					        	"userID INTEGER, "+
+					          	"quoteID INTEGER, "+
+					        	"msgTime DATETIME, "+
+					          	"price DOUBLE, "+
+					        	"scheduleStart DATETIME, "+
+					          	"scheduleEnd DATETIME, "+
+					        	"note VARCHAR(200), "+
+					          	"FOREIGN KEY(userID) REFERENCES User(id),"+
+					        	"FOREIGN KEY(quoteID) REFERENCES Quote(quoteID)"+
+					         ");",
+					         "CREATE TABLE if not exists Order( "+
+					            "orderID INT AUTO_INCREMENT PRIMARY KEY, "+
+					        	"quoteID INTEGER, "+
+					            "price DOUBLE, "+
+					        	"scheduleStart DATETIME, "+
+					            "scheduleEnd DATETIME, "+
+					            "FOREIGN KEY(quoteID) REFERENCES Quote(quoteID)"+
+					         ");",
+					         "CREATE TABLE if not exists Bills( "+
+					            "billID INT AUTO_INCREMENT PRIMARY KEY, "+
+					        	"orderID INTEGER, "+
+					            "price DOUBLE, "+
+					        	"discount DOUBLE, "+
+					            "balance DOUBLE, "+
+					        	"status VARCHAR(20), "+
+					            "FOREIGN KEY(orderID) REFERENCES Order(orderID)"+
+					         ");",
+					         "CREATE TABLE if not exists BillMessages( "+
+					            "billMessageID INT AUTO_INCREMENT PRIMARY KEY, "+
+					            "userID INTEGER, "+
+					            "billID INTEGER, "+
+					            "msgTime DATETIME, "+
+					            "price DOUBLE, "+
+					            "scheduleStart DATETIME, "+
+					            "scheduleEnd DATETIME, "+
+					            "note VARCHAR(200), "+
+					            "FOREIGN KEY(userID) REFERENCES User(id), "+
+					            "FOREIGN KEY(billID) REFERENCES Bills(billID)"+
+					         ");",
+					            
+					          	
+					          
         					};
         String[] TUPLES = {("insert into User(id, email, firstName, lastName, password, creditCardNumber, phoneNumber, role, adress_street_num, adress_street, adress_city, adress_state, adress_zip_code)"+
         			"values (id,'root', 'default', 'default','pass1234', '1234-3456-4567-5678','123-234-4567', 'root', '0000', 'Default', 'Default', '0', '00000'),"+
