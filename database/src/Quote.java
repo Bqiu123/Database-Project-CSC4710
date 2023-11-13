@@ -5,6 +5,7 @@ public class Quote
 	protected String timeWindow;
 	protected String status;
 	protected String clientID;
+	protected String contractorID;
 	
 	//Constructors
 	public Quote() {}
@@ -14,19 +15,20 @@ public class Quote
 		this.quoteID = quoteID;
 	}
 	
-	public Quote(String quoteID, String initialPrice, String timeWindow, String status, String clientID)
+	public Quote(String quoteID, String initialPrice, String timeWindow, String status, String clientID, String contractorID)
 	{
-		this(initialPrice, timeWindow, status, clientID);
+		this(initialPrice, timeWindow, status, clientID, contractorID);
 		this.quoteID = quoteID;
 		
 	}
 	
-	public Quote(String initialPrice, String timeWindow, String status, String clientID)
+	public Quote(String initialPrice, String timeWindow, String status, String clientID, String contractorID)
 	{
 		this.initialPrice = initialPrice;
 		this.timeWindow = timeWindow;
 		this.status = status;
 		this.clientID = clientID;
+		this.contractorID = contractorID;
 	}
 	
 	//Getter and setter methods
@@ -77,5 +79,15 @@ public class Quote
 	public void setClientID(String clientID)
 	{
 		this.clientID = clientID;
+	}
+	
+	public String getContractorID()
+	{
+		return contractorID;
+	}
+	
+	public void setContractorID(String contractorID)
+	{
+		this.contractorID = contractorID;
 	}
 }

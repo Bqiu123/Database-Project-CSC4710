@@ -31,7 +31,6 @@
                 <th>Role</th>
                 <th>Address</th>
                 <th>Password</th>
-                <th>Tree Amount</th>
             </tr> 
             <c:forEach var="users" items="${listUser}">
                 <tr style="text-align:center">
@@ -44,11 +43,171 @@
 			        <td><c:out value="${users.role}" /></td>
                     <td><c:out value="${users.adress_street_num} ${users.adress_street} ${users.adress_city} ${users.adress_state} ${users.adress_zip_code}" /></td>
                     <td><c:out value="${users.password}" /></td>
-                    <td><c:out value="${users.tree_amt}" /></td>
 
             </c:forEach>
         </table>
 	</div>
+	
+<h1>List all trees</h1>
+    <div align="center">
+        <table border="1" cellpadding="6">
+            <caption><h2>List of Trees</h2></caption>
+            <tr>
+                <th>Tree ID</th>
+                <th>Size</th>
+                <th>Height</th>
+                <th>Location</th>
+                <th>Distance to House</th>
+                <th>Quote ID</th>
+            </tr>
+            <c:forEach var="tree" items="${listTree}">
+                <tr style="text-align:center">
+                    <td><c:out value="${tree.treeID}" /></td>
+                    <td><c:out value="${tree.size}" /></td>
+                    <td><c:out value="${tree.height}" /></td>
+                    <td><c:out value="${tree.location}" /></td>
+                    <td><c:out value="${tree.proximityToHouse}" /></td>
+                    <td><c:out value="${tree.quoteID}" /></td>
+                </tr>
+            </c:forEach>
+        </table>
+    </div>
+    
+<h1>List all quotes</h1>
+    <!-- Quote Table -->
+    <div align="center">
+        <table border="1" cellpadding="6">
+            <caption><h2>List of Quotes</h2></caption>
+            <tr>
+                <th>Quote ID</th>
+                <th>Initial Price</th>
+                <th>Time Window</th>
+                <th>Status</th>
+                <th>Client ID</th>
+                <th>Contractor ID</th>
+            </tr>
+            <c:forEach var="quote" items="${listQuote}">
+                <tr style="text-align:center">
+                    <td><c:out value="${quote.quoteID}" /></td>
+                    <td><c:out value="${quote.initialPrice}" /></td>
+                    <td><c:out value="${quote.timeWindow}" /></td>
+                    <td><c:out value="${quote.status}" /></td>
+                    <td><c:out value="${quote.clientID}" /></td>
+                    <td><c:out value="${quote.contractorID}" /></td>
+                </tr>
+            </c:forEach>
+        </table>
+    </div>
+    
+ <h1>List all quote messages</h1>
+    <!-- Quote Message Table -->
+    <div align="center">
+        <table border="1" cellpadding="6">
+            <caption><h2>List of Quote Messages</h2></caption>
+            <tr>
+                <th>Quote Message ID</th>
+                <th>User ID</th>
+                <th>Quote ID</th>
+                <th>Message Time</th>
+                <th>Price</th>
+                <th>Schedule Start</th>
+                <th>Schedule End</th>
+                <th>Note</th>
+            </tr>
+            <c:forEach var="quoteMessage" items="${listQuoteMessages}">
+                <tr style="text-align:center">
+                    <td><c:out value="${quoteMessage.quoteMessageID}" /></td>
+                    <td><c:out value="${quoteMessage.userID}" /></td>
+                    <td><c:out value="${quoteMessage.quoteID}" /></td>
+                    <td><c:out value="${quoteMessage.msgTime}" /></td>
+                    <td><c:out value="${quoteMessage.price}" /></td>
+                    <td><c:out value="${quoteMessage.scheduleStart}" /></td>
+                    <td><c:out value="${quoteMessage.scheduleEnd}" /></td>
+                    <td><c:out value="${quoteMessage.note}" /></td>
+                </tr>
+            </c:forEach>
+        </table>
+    </div>
+	
+	<h1>List all orders</h1>
+    <!-- Order Table -->
+    <div align="center">
+        <table border="1" cellpadding="6">
+            <caption><h2>List of Orders</h2></caption>
+            <tr>
+                <th>Order ID</th>
+                <th>Quote ID</th>
+                <th>Price</th>
+                <th>Schedule Start</th>
+                <th>Schedule End</th>
+            </tr>
+            <c:forEach var="order" items="${listOrders}">
+                <tr style="text-align:center">
+                    <td><c:out value="${order.orderID}" /></td>
+                    <td><c:out value="${order.quoteID}" /></td>
+                    <td><c:out value="${order.price}" /></td>
+                    <td><c:out value="${order.scheduleStart}" /></td>
+                    <td><c:out value="${order.scheduleEnd}" /></td>
+                </tr>
+            </c:forEach>
+        </table>
+    </div>
+	
+	<h1>List all bills</h1>
+    <!-- Bill Table -->
+    <div align="center">
+        <table border="1" cellpadding="6">
+            <caption><h2>List of Bills</h2></caption>
+            <tr>
+                <th>Bill ID</th>
+                <th>Order ID</th>
+                <th>Price</th>
+                <th>Discount</th>
+                <th>Balance</th>
+                <th>Status</th>
+            </tr>
+            <c:forEach var="bill" items="${listBills}">
+                <tr style="text-align:center">
+                    <td><c:out value="${bill.billID}" /></td>
+                    <td><c:out value="${bill.orderID}" /></td>
+                    <td><c:out value="${bill.price}" /></td>
+                    <td><c:out value="${bill.discount}" /></td>
+                    <td><c:out value="${bill.balance}" /></td>
+                    <td><c:out value="${bill.status}" /></td>
+                </tr>
+            </c:forEach>
+        </table>
+    </div>
+    
+    <h1>List all bill messages</h1>
+    <!-- Bill Message Table -->
+    <div align="center">
+        <table border="1" cellpadding="6">
+            <caption><h2>List of Bill Messages</h2></caption>
+            <tr>
+                <th>Bill Message ID</th>
+                <th>User ID</th>
+                <th>Bill ID</th>
+                <th>Message Time</th>
+                <th>Price</th>
+                <th>Schedule Start</th>
+                <th>Schedule End</th>
+                <th>Note</th>
+            </tr>
+            <c:forEach var="billMessage" items="${listBillMessages}">
+                <tr style="text-align:center">
+                    <td><c:out value="${billMessage.billMessageID}" /></td>
+                    <td><c:out value="${billMessage.userID}" /></td>
+                    <td><c:out value="${billMessage.billID}" /></td>
+                    <td><c:out value="${billMessage.msgTime}" /></td>
+                    <td><c:out value="${billMessage.price}" /></td>
+                    <td><c:out value="${billMessage.scheduleStart}" /></td>
+                    <td><c:out value="${billMessage.scheduleEnd}" /></td>
+                    <td><c:out value="${billMessage.note}" /></td>
+                </tr>
+            </c:forEach>
+        </table>
+    </div>
 	</div>
 
 </body>

@@ -65,10 +65,34 @@ public class ControlServlet extends HttpServlet {
         	case "/logout":
         		logout(request,response);
         		break;
-        	 case "/list": 
-                 System.out.println("The action is: list");
-                 listUser(request, response);           	
-                 break;
+        	case "/list": 
+                System.out.println("The action is: list");
+                listUser(request, response);           	
+                break;
+        	case "/listTree":
+        		System.out.println("The action is: listTree");
+        		listTree(request, response);
+        		break;
+        	case "/listQuote":
+        		System.out.println("The action is: listQuote");
+        		listQuote(request, response);
+        		break;
+        	case "/listQuoteMessages":
+        		System.out.println("The action is: listQuoteMessages");
+        		listQuoteMessages(request, response);
+        		break;
+        	case "/listOrder":
+        		System.out.println("The action is: listOrder");
+        		listOrders(request, response);
+        		break;
+        	case "/listBills":
+        		System.out.println("The action is: listBills");
+        		listBills(request, response);
+        		break;
+        	case "/listBillMessages":
+        		System.out.println("The action is: listBillMessages");
+        		listBills(request, response);
+        		break;
 	    	}
 	    }
 	    catch(Exception ex) {
@@ -88,10 +112,88 @@ public class ControlServlet extends HttpServlet {
 	     
 	        System.out.println("listPeople finished: 111111111111111111111111111111111111");
 	    }
-	    	        
+	    
+	    private void listTree(HttpServletRequest request, HttpServletResponse response)
+	    		throws SQLException, IOException, ServletException {
+	    	System.out.println("listTree started: 00000000000000000000000000000000000");
+	    	
+	    	List<Tree> listTree = userDAO.listAllTrees();
+	    	request.setAttribute("listTree", listTree);
+	    	RequestDispatcher dispatcher = request.getRequestDispatcher("rootView.jsp");
+	    	dispatcher.forward(request, response);
+	    	
+	    	System.out.println("listTree finished: 111111111111111111111111111111111111");
+	    }
+	    
+	    private void listQuote(HttpServletRequest request, HttpServletResponse response)
+	    		throws SQLException, IOException, ServletException {
+	    	System.out.println("listQuote started: 00000000000000000000000000000000000");
+	    	
+	    	List<Quote> listQuote = userDAO.listAllQuotes();
+	    	request.setAttribute("listQuote", listQuote);
+	    	RequestDispatcher dispatcher = request.getRequestDispatcher("rootView.jsp");
+	    	dispatcher.forward(request, response);
+	    	
+	    	System.out.println("listQuote finished: 111111111111111111111111111111111111");
+	    }
+	    
+	    private void listQuoteMessages(HttpServletRequest request, HttpServletResponse response)
+	    		throws SQLException, IOException, ServletException {
+	    	System.out.println("listQuoteMessages started: 00000000000000000000000000000000000");
+	    	
+	    	List<QuoteMessages> listQuoteMessages = userDAO.listAllQuoteMessages();
+	    	request.setAttribute("listQuoteMessages", listQuoteMessages);
+	    	RequestDispatcher dispatcher = request.getRequestDispatcher("rootView.jsp");
+	    	dispatcher.forward(request, response);
+	    	
+	    	System.out.println("listQuoteMessages finished: 111111111111111111111111111111111111");
+	    }
+	    
+	    private void listOrders(HttpServletRequest request, HttpServletResponse response)
+	    		throws SQLException, IOException, ServletException {
+	    	System.out.println("listOrders started: 00000000000000000000000000000000000");
+	    	
+	    	List<Order> listOrders = userDAO.listAllOrders();
+	    	request.setAttribute("listOrders", listOrders);
+	    	RequestDispatcher dispatcher = request.getRequestDispatcher("rootView.jsp");
+	    	dispatcher.forward(request, response);
+	    	
+	    	System.out.println("listOrders finished: 111111111111111111111111111111111111");
+	    }
+	    
+	    private void listBills(HttpServletRequest request, HttpServletResponse response)
+	    		throws SQLException, IOException, ServletException {
+	    	System.out.println("listBills started: 00000000000000000000000000000000000");
+	    	
+	    	List<Bills> listBills = userDAO.listAllBills();
+	    	request.setAttribute("listBills", listBills);
+	    	RequestDispatcher dispatcher = request.getRequestDispatcher("rootView.jsp");
+	    	dispatcher.forward(request, response);
+	    	
+	    	System.out.println("listBills finished: 111111111111111111111111111111111111");
+	    }
+	    
+	    private void listBillMessages(HttpServletRequest request, HttpServletResponse response)
+	    		throws SQLException, IOException, ServletException {
+	    	System.out.println("listBillMessages started: 00000000000000000000000000000000000");
+	    	
+	    	List<BillMessages> listBillMessages = userDAO.listAllBillMessages();
+	    	request.setAttribute("listBillMessages", listBillMessages);
+	    	RequestDispatcher dispatcher = request.getRequestDispatcher("rootView.jsp");
+	    	dispatcher.forward(request, response);
+	    	
+	    	System.out.println("listBills finished: 111111111111111111111111111111111111");
+	    }
+	    
 	    private void rootPage(HttpServletRequest request, HttpServletResponse response, String view) throws ServletException, IOException, SQLException{
 	    	System.out.println("root view");
 			request.setAttribute("listUser", userDAO.listAllUsers());
+			request.setAttribute("listTree", userDAO.listAllTrees());
+			request.setAttribute("listQuote", userDAO.listAllQuotes());
+			request.setAttribute("listQuoteMessages", userDAO.listAllQuoteMessages());
+			request.setAttribute("listOrders", userDAO.listAllOrders());
+			request.setAttribute("listBills", userDAO.listAllBills());
+			request.setAttribute("listBillMessages", userDAO.listAllBillMessages());
 	    	request.getRequestDispatcher("rootView.jsp").forward(request, response);
 	    }
 	    
@@ -147,14 +249,9 @@ public class ControlServlet extends HttpServlet {
 	   	 	String adress_city = request.getParameter("adress_city"); 
 	   	 	String adress_state = request.getParameter("adress_state"); 
 	   	 	String adress_zip_code = request.getParameter("adress_zip_code"); 	 
-	   	 	String tree_amt = "0";
-	   	 	String tree_size = "0";
-	   	 	String tree_height = "0";
-	   	 	String tree_distance = "0";
-	   	 	String tree_location = "NULL";
 	   	 	String confirm = request.getParameter("confirmation");
 	   	 	
-	   	 Pattern namePattern = Pattern.compile("^[a-zA-Z]+$");
+	   	 	Pattern namePattern = Pattern.compile("^[a-zA-Z]+$");
 			Pattern emailPattern = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
 			Pattern phonePattern = Pattern.compile("^\\d{3}-\\d{3}-\\d{4}$");
 			Pattern creditCardPattern = Pattern.compile("^\\d{4}-\\d{4}-\\d{4}-\\d{4}$");
@@ -191,7 +288,7 @@ public class ControlServlet extends HttpServlet {
 			   	 }
 	   	 		if (!userDAO.checkEmail(email)) {
 		   	 		System.out.println("Registration Successful! Added to database");
-		            user users = new user(id, email,firstName, lastName, password, creditCardNumber, phoneNumber, role, adress_street_num,  adress_street,  adress_city,  adress_state,  adress_zip_code, tree_amt, tree_size, tree_height, tree_distance, tree_location);
+		            user users = new user(id, email,firstName, lastName, password, creditCardNumber, phoneNumber, role, adress_street_num,  adress_street,  adress_city,  adress_state,  adress_zip_code);
 		   	 		userDAO.insert(users);
 		   	 		response.sendRedirect("login.jsp");
 	   	 		}
