@@ -54,6 +54,9 @@ public class ControlServlet extends HttpServlet {
         	case "/register":
         		register(request, response);
         		break;
+        	case "/initialRequest":
+        		initialRequest(request, response);
+        		break;
         	case "/initialize":
         		userDAO.init();
         		System.out.println("Database successfully initialized!");
@@ -91,7 +94,7 @@ public class ControlServlet extends HttpServlet {
         		break;
         	case "/listBillMessages":
         		System.out.println("The action is: listBillMessages");
-        		listBills(request, response);
+        		listBillMessages(request, response);
         		break;
 	    	}
 	    }
@@ -304,6 +307,19 @@ public class ControlServlet extends HttpServlet {
 	   		 request.getRequestDispatcher("register.jsp").forward(request, response);
 	   	 	}
 	    }    
+	    
+	    private void initialRequest(HttpServletRequest request, HttpServletResponse response)
+	    		throws ServletException, IOException, SQLException {
+	    	String size = request.getParameter("size");
+	    	String height = request.getParameter("height");
+	    	String location = request.getParameter("location");
+	    	String proximityToHouse = request.getParameter("proximityToHouse");
+	    	String quoteID = request.getParameter("quoteID");
+	    	Tree tree = new Tree(size, height, location, proximityToHouse, quoteID);
+	    	userDAO.insertTree(tree);
+	    	response.sendRedirect("activitypage.jsp");
+	    	
+	    }
 	    
 	    private void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	    	currentUser = "";
