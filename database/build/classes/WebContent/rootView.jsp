@@ -58,6 +58,7 @@
                 <th>Height</th>
                 <th>Location</th>
                 <th>Distance to House</th>
+                <th>Client ID</th>
                 <th>Quote ID</th>
             </tr>
             <c:forEach var="tree" items="${listTree}">
@@ -67,6 +68,7 @@
                     <td><c:out value="${tree.height}" /></td>
                     <td><c:out value="${tree.location}" /></td>
                     <td><c:out value="${tree.proximityToHouse}" /></td>
+                    <td><c:out value="${tree.clientID}" /></td>
                     <td><c:out value="${tree.quoteID}" /></td>
                 </tr>
             </c:forEach>

@@ -5,6 +5,7 @@ public class Tree
 	protected String height;
 	protected String location;
 	protected String proximityToHouse;
+	protected String clientID;
 	protected String quoteID;
 	
 	//Constructors
@@ -15,18 +16,19 @@ public class Tree
 		this.treeID = treeID;
 	}
 	
-	public Tree(String treeID, String size, String height, String location, String proximityToHouse, String quoteID)
+	public Tree(String treeID, String size, String height, String location, String proximityToHouse, String clientID, String quoteID)
 	{
-		this(size, height, location, proximityToHouse, quoteID);
+		this(size, height, location, proximityToHouse, clientID, quoteID);
 		this.treeID = treeID;
 	}
 	
-	public Tree(String size, String height, String location, String proximityToHouse, String quoteID)
+	public Tree(String size, String height, String location, String proximityToHouse, String clientID, String quoteID)
 	{
 		this.size = size;
 		this.height = height;
 		this.location = location;
 		this.proximityToHouse = proximityToHouse;
+		this.clientID = clientID;
 		this.quoteID = quoteID;
 	}
 	
@@ -79,6 +81,16 @@ public class Tree
 	public void setProximityToHouse(String proximityToHouse)
 	{
 		this.proximityToHouse = proximityToHouse;
+	}
+	
+	public String getClientID()
+	{
+		return clientID;
+	}
+	
+	public void setClientID(String clientID)
+	{
+		this.clientID = clientID;
 	}
 	
 	public String getQuoteID()

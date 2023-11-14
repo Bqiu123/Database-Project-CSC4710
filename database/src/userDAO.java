@@ -223,13 +223,14 @@ public class userDAO
     	PreparedStatement preparedStatement = null;
     	try {
         	connect_func("root", "pass1234");
-        	String sql= "insert into Tree(size, height, location, proximityToHouse, quoteID) values (?, ?, ?, ?, ?)";
+        	String sql= "insert into Tree(size, height, location, proximityToHouse, clientID, quoteID) values (?, ?, ?, ?, ?, ?)";
         	preparedStatement = (PreparedStatement) connect.prepareStatement(sql);
         	preparedStatement.setString(1, tree.getSize());
         	preparedStatement.setString(2, tree.getHeight());
         	preparedStatement.setString(3, tree.getLocation());
         	preparedStatement.setString(4, tree.getProximityToHouse());
-        	preparedStatement.setString(5, tree.getQuoteID());
+        	preparedStatement.setString(5, tree.getClientID());
+        	preparedStatement.setString(6, tree.getQuoteID());
         	
         	preparedStatement.executeUpdate();
     	}catch (SQLException e) {
@@ -255,9 +256,10 @@ public class userDAO
     		String height = resultSet.getString("height");
     		String location = resultSet.getString("location");
     		String proximityToHouse = resultSet.getString("proximityToHouse");
+    		String clientID = resultSet.getString("clientID");
     		String quoteID = resultSet.getString("quoteID");
     		
-    		Tree tree = new Tree(treeID, size, height, location, proximityToHouse, quoteID);
+    		Tree tree = new Tree(treeID, size, height, location, proximityToHouse, clientID, quoteID);
     		listTree.add(tree);
     	}
     	resultSet.close();
@@ -281,9 +283,9 @@ public class userDAO
     		String height = resultSet.getString("height");
     		String location = resultSet.getString("location");
     		String proximityToHouse = resultSet.getString("proximityToHouse");
-    		String quoteID = resultSet.getString("quoteID");
-    		
-    		tree = new Tree(treeID, size, height, location, proximityToHouse, quoteID);
+    		String clientID = resultSet.getString("clientID");
+    		String quoteID = resultSet.getString("quoteID");    		
+    		tree = new Tree(treeID, size, height, location, proximityToHouse, clientID, quoteID);
     		
     	}
     	resultSet.close();
@@ -294,14 +296,15 @@ public class userDAO
     
     public boolean updateTree(Tree tree) throws SQLException{
     	PreparedStatement preparedStatement = null;
-    	String sql = "update Tree set size = ?, height = ?, location = ?, proximityToHouse = ?, quoteID = ?, where treeID = ?";
+    	String sql = "update Tree set size = ?, height = ?, location = ?, proximityToHouse = ?, clientID = ?, quoteID = ?,  where treeID = ?";
     	connect_func();
     	preparedStatement = connect.prepareStatement(sql);
     	preparedStatement.setString(1, tree.getSize());
     	preparedStatement.setString(2, tree.getHeight());
     	preparedStatement.setString(3, tree.getLocation());
     	preparedStatement.setString(4, tree.getProximityToHouse());
-    	preparedStatement.setString(5, tree.getQuoteID());
+    	preparedStatement.setString(5, tree.getClientID());
+    	preparedStatement.setString(6, tree.getQuoteID());
     	
     	boolean rowUpdated = preparedStatement.executeUpdate() > 0;
     	preparedStatement.close();
@@ -1101,6 +1104,56 @@ public class userDAO
         return resultSet.next();
     }
     
+    public String getUserIDByEmail(String email) throws SQLException {
+        String id = null;
+        String sql = "SELECT id FROM User WHERE email = ?";
+
+        try {
+            connect_func();
+            preparedStatement = connect.prepareStatement(sql);
+            preparedStatement.setString(1, email);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                id = resultSet.getString("id");
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+        return id;
+    }
+
+    public List<Tree> listTreesWithoutQuote() throws SQLException {
+        List<Tree> listTree = new ArrayList<>();
+        String sql = "SELECT * FROM Tree WHERE quoteID IS NULL OR quoteID = ''";
+        connect_func(); 
+        try (Statement statement = connect.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                Tree tree = new Tree(
+                    resultSet.getString("treeID"),
+                    resultSet.getString("size"),
+                    resultSet.getString("height"),
+                    resultSet.getString("location"),
+                    resultSet.getString("proximityToHouse"),
+                    resultSet.getString("clientID"),
+                    resultSet.getString("quoteID")
+                );
+                listTree.add(tree);
+            }
+        }
+        return listTree;
+    }
+
+    
     public void init() throws SQLException, FileNotFoundException, IOException{
     	connect_func();
         statement =  (Statement) connect.createStatement();
@@ -1148,8 +1201,10 @@ public class userDAO
 					            "height DOUBLE, " +
 					            "location VARCHAR(255), " +
 					            "proximityToHouse DOUBLE, " +
-					            "quoteID INT, " +
-					            "FOREIGN KEY (quoteID) REFERENCES Quote(quoteID)" +
+					            "clientID INT, " +
+					            "quoteID INT," +
+					            "FOREIGN KEY (quoteID) REFERENCES Quote(quoteID)," +
+					            "FOREIGN KEY (clientID) REFERENCES User(id)" +
 					         ");",
 					         "CREATE TABLE if not exists QuoteMessages( "+
 					          	"quoteMessageID INT AUTO_INCREMENT PRIMARY KEY, "+
@@ -1220,17 +1275,17 @@ public class userDAO
 			    		 	"(160.00, '2023-12-20 to 2023-12-21', 'Confirmed', 8, 1),"+
 			    		 	"(190.85, '2023-12-25 to 2023-12-26', 'Pending', 9, 1),"+
 			    		 	"(210.60, '2023-12-30 to 2023-12-31', 'Confirmed', 10, 1);"),
-        		 			("INSERT INTO Tree (size, height, location, proximityToHouse, quoteID) VALUES" +
-        				    "(5.5, 20, '123 Oak Street', 10, 1)," +
-        				    "(3.2, 15, '456 Pine Lane', 15, 2)," +
-        				    "(6.7, 25, '789 Maple Ave', 5, 3)," +
-        				    "(4.5, 18, '321 Birch Road', 8, 4)," +
-        				    "(2.8, 10, '654 Cedar Blvd', 12, 5)," +
-        				    "(5.0, 22, '987 Elm Street', 7, 6)," +
-        				    "(3.6, 16, '123 Spruce Lane', 11, 7)," +
-        				    "(4.8, 20, '456 Fir Avenue', 9, 8)," +
-        				    "(7.1, 28, '789 Redwood Drive', 4, 9)," +
-        				    "(3.0, 14, '321 Willow Way', 13, 10);"),        		 			        		 			
+        		 			("INSERT INTO Tree (size, height, location, proximityToHouse, clientID, quoteID) VALUES" +
+        				    "(5.5, 20, '123 Oak Street', 10, 1, 1)," +
+        				    "(3.2, 15, '456 Pine Lane', 15, 2, 2)," +
+        				    "(6.7, 25, '789 Maple Ave', 5, 3, 3)," +
+        				    "(4.5, 18, '321 Birch Road', 8, 4, NULL)," +
+        				    "(2.8, 10, '654 Cedar Blvd', 12, 5, NULL)," +
+        				    "(5.0, 22, '987 Elm Street', 7, 6, NULL)," +
+        				    "(3.6, 16, '123 Spruce Lane', 11, 7, NULL)," +
+        				    "(4.8, 20, '456 Fir Avenue', 9, 8, NULL)," +
+        				    "(7.1, 28, '789 Redwood Drive', 4, 9, NULL)," +
+        				    "(3.0, 14, '321 Willow Way', 13, 10, NULL);"),
         		 			("INSERT INTO QuoteMessages (userID, quoteID, msgTime, price, scheduleStart, scheduleEnd, note) VALUES" +
         		 			"(1, 1, '2023-11-12 10:00:00', 200.50, '2023-11-15 08:00:00', '2023-11-16 18:00:00', 'First message note')," +
         		 			"(2, 2, '2023-11-13 11:00:00', 150.75, '2023-11-20 09:00:00', '2023-11-21 17:00:00', 'Second message note')," +
