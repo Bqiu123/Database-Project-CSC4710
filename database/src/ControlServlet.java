@@ -54,6 +54,12 @@ public class ControlServlet extends HttpServlet {
         	case "/register":
         		register(request, response);
         		break;
+        	case "/initialQuote":
+        		initialQuote(request, response);
+        		break;
+        	case "/initialRequest":
+        		initialRequest(request, response);
+        		break;
         	case "/initialize":
         		userDAO.init();
         		System.out.println("Database successfully initialized!");
@@ -61,6 +67,9 @@ public class ControlServlet extends HttpServlet {
         		break;
         	case "/root":
         		rootPage(request,response, "");
+        		break;
+        	case "/davidSmith":
+        		davidSmithDashBoard(request, response, "");
         		break;
         	case "/logout":
         		logout(request,response);
@@ -91,7 +100,7 @@ public class ControlServlet extends HttpServlet {
         		break;
         	case "/listBillMessages":
         		System.out.println("The action is: listBillMessages");
-        		listBills(request, response);
+        		listBillMessages(request, response);
         		break;
 	    	}
 	    }
@@ -197,12 +206,11 @@ public class ControlServlet extends HttpServlet {
 	    	request.getRequestDispatcher("rootView.jsp").forward(request, response);
 	    }
 	    
-	    private void davidSmithPage(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException{
-	    	System.out.println("David Smith Dashboard");
-	    	request.setAttribute("listUser", userDAO.listAllUsers());
+	    private void davidSmithDashBoard(HttpServletRequest request, HttpServletResponse response, String view) throws ServletException, IOException, SQLException{
+	    	List<Tree> listTreeWithoutQuote = userDAO.listTreesWithoutQuote();
+	        request.setAttribute("listTreeWithoutQuote", listTreeWithoutQuote);
 	    	request.getRequestDispatcher("davidSmithDashboard.jsp").forward(request, response);
 	    }
-	    
 	    
 	    protected void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
 	    	 String email = request.getParameter("email");
@@ -218,13 +226,19 @@ public class ControlServlet extends HttpServlet {
 	    	 else if(email.equals("davidsmith@gmail.com") && password.equals("david1234"))
 	    	 {
 	    		 System.out.println("Welcome David Smith! Redirecing to your dashboard");
-	    		 request.getRequestDispatcher("davidSmithDashboard.jsp").forward(request, response);
+	    		 session = request.getSession();
+	    		 session.setAttribute("username", email);
+	    		 davidSmithDashBoard(request, response, "");
 	    	 }
 	    	 
 	    	 else if(userDAO.isValid(email, password)) 
 	    	 {
+			 	 String userID = userDAO.getUserIDByEmail(email);
 			 	 
 			 	 currentUser = email;
+			 	 session = request.getSession();
+			 	 session.setAttribute("userID", userID);
+			 	 session.setAttribute("username", email);
 				 System.out.println("Login Successful! Redirecting");
 				 request.getRequestDispatcher("activitypage.jsp").forward(request, response);
 			 			 			 			 
@@ -303,7 +317,84 @@ public class ControlServlet extends HttpServlet {
 	   		 request.setAttribute("errorTwo","Registration failed: Password and Password Confirmation do not match.");
 	   		 request.getRequestDispatcher("register.jsp").forward(request, response);
 	   	 	}
-	    }    
+	    }   
+	    
+	    private void initialQuote(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+	    	String initialPrice = request.getParameter("initialPrice");
+	    	String timeWindow = request.getParameter("timeWindow");
+	    	String treeID = request.getParameter("treeID");
+	    	if (treeID == null || treeID.isEmpty()) {
+	    	    // Handle missing treeID
+	    	    request.setAttribute("errorMessage", "Tree ID is required.");
+	    	    request.getRequestDispatcher("processQuote.jsp").forward(request, response);
+	    	    return;
+	    	    }
+	    	// Get the status parameter, default to "pending" if not present
+	        String status = request.getParameter("status");
+	        if (status == null || status.isEmpty()) {
+	            status = "pending";
+	        }
+
+	        // Get the clientID parameter, default to null if not present
+	        String clientID = request.getParameter("clientID");
+	        if (clientID == null || clientID.isEmpty()) {
+	            clientID = null; // Or you can simply leave it as it is, since it defaults to null
+	        }
+
+	        // Get the contractorID parameter, default to "1" if not present
+	        String contractorID = request.getParameter("contractorID");
+	        if (contractorID == null || contractorID.isEmpty()) {
+	            contractorID = "1";
+	        }
+	        
+	        if (initialPrice == null || initialPrice.isEmpty() ||
+	        		timeWindow == null || timeWindow.isEmpty() || 
+	        		        clientID == null || clientID.isEmpty()) {
+
+		            // Set error message in request and forward to the form page
+		            request.setAttribute("errorMessage", "All fields are required.");
+		            request.getRequestDispatcher("processQuote.jsp").forward(request, response);
+		        } else {
+		            // Proceed with normal flow if all fields are filled
+		            Quote quote = new Quote(initialPrice, timeWindow, status, clientID, contractorID);
+		            userDAO.insertQuote(quote, treeID);
+		            
+		            request.getSession().setAttribute("successMessage", "Request Submitted Successfully. Please wait for a response.");
+		            davidSmithDashBoard(request, response, "");
+		            response.sendRedirect("davidSmithDashboard.jsp");
+		        }
+	    }
+	    
+	    private void initialRequest(HttpServletRequest request, HttpServletResponse response)
+	            throws ServletException, IOException, SQLException {
+	        // Get parameters from request
+	        String size = request.getParameter("size");
+	        String height = request.getParameter("height");
+	        String location = request.getParameter("location");
+	        String proximityToHouse = request.getParameter("proximityToHouse");
+	        String clientID = request.getParameter("clientID");
+	        String quoteID = request.getParameter("quoteID");
+
+	        // Check for empty fields
+	        if (size == null || size.isEmpty() ||
+	            height == null || height.isEmpty() ||
+	            location == null || location.isEmpty() ||
+	            proximityToHouse == null || proximityToHouse.isEmpty() ||
+	            clientID == null || clientID.isEmpty()) {
+
+	            // Set error message in request and forward to the form page
+	            request.setAttribute("errorMessage", "All fields are required.");
+	            request.getRequestDispatcher("activitypage.jsp").forward(request, response);
+	        } else {
+	            // Proceed with normal flow if all fields are filled
+	            Tree tree = new Tree(size, height, location, proximityToHouse, clientID, quoteID);
+	            userDAO.insertTree(tree);
+	            
+	            request.getSession().setAttribute("successMessage", "Request Submitted Successfully. Please wait for a response.");
+	            response.sendRedirect("activitypage.jsp");
+	        }
+	    }
+
 	    
 	    private void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	    	currentUser = "";
