@@ -327,28 +327,49 @@ public class userDAO
     
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   //CRUD methods for Quote;
-    public void insertQuote(Quote quote) throws SQLException{
-    	PreparedStatement preparedStatement = null;
-    	try {
-        	connect_func("root", "pass1234");
-        	String sql= "insert into Quote(initialPrice, timeWindow, status, clientID, contractorID) values (?, ?, ?, ?, ?)";
-        	preparedStatement = (PreparedStatement) connect.prepareStatement(sql);
-        	preparedStatement.setString(1, quote.getInitialPrice());
-        	preparedStatement.setString(2, quote.getTimeWindow());
-        	preparedStatement.setString(3, quote.getStatus());
-        	preparedStatement.setString(4, quote.getClientID());
-        	preparedStatement.setString(5, quote.getContractorID());
-        	
-        	preparedStatement.executeUpdate();
-    	}catch (SQLException e) {
-    		//Handle exception
-    		throw e;
-    	}finally {
-    		if (preparedStatement != null) {
-    			preparedStatement.close();
-    		}
-    	}
+    public void insertQuote(Quote quote, String treeID) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        ResultSet generatedKeys = null;
+        try {
+            connect_func(); // Connect to the database
+            String insertSql = "INSERT INTO Quote (initialPrice, timeWindow, status, clientID, contractorID) VALUES (?, ?, ?, ?, ?)";
+            preparedStatement = connect.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1, quote.getInitialPrice());
+            preparedStatement.setString(2, quote.getTimeWindow());
+            preparedStatement.setString(3, quote.getStatus());
+            preparedStatement.setString(4, quote.getClientID());
+            preparedStatement.setString(5, quote.getContractorID());
+            int affectedRows = preparedStatement.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new SQLException("Creating quote failed, no rows affected.");
+            }
+
+            // Retrieve the generated quoteID
+            generatedKeys = preparedStatement.getGeneratedKeys();
+            long quoteID;
+            if (generatedKeys.next()) {
+                quoteID = generatedKeys.getLong(1); // This gets the generated quoteID
+
+                // Update the tree table with this quoteID
+                String updateTreeSql = "UPDATE Tree SET quoteID = ? WHERE treeID = ?";
+                try (PreparedStatement updateStmt = connect.prepareStatement(updateTreeSql)) {
+                    updateStmt.setLong(1, quoteID);
+                    updateStmt.setString(2, treeID); // Use the passed treeID
+                    updateStmt.executeUpdate();
+                }
+            } else {
+                throw new SQLException("Creating quote failed, no ID obtained.");
+            }
+        } catch (SQLException e) {
+            // Handle exception
+            throw e;
+        } finally {
+            if (generatedKeys != null) generatedKeys.close();
+            if (preparedStatement != null) preparedStatement.close();
+        }
     }
+
     
     public List<Quote> listAllQuotes() throws SQLException{
     	List<Quote> listQuote = new ArrayList<Quote>();

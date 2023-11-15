@@ -34,26 +34,17 @@
                     <td><c:out value="${tree.location}" /></td>
                     <td><c:out value="${tree.proximityToHouse}" /></td>
                     <td><c:out value="${tree.clientID}" /></td>
-                    <td><button type="button" onclick="showQuoteForm('${tree.treeID}')">Send Quote</button></td>
+                    <td>
+			            <form action="processQuote.jsp" method="post">
+			                <input type="hidden" name="treeID" value="${tree.treeID}" />
+			                <input type="hidden" name="clientID" value="${tree.clientID}" />
+			                <button type="submit">Send Quote</button>
+			            </form>
+			        </td>
                 </tr>
             </c:forEach>
         </table>
     </div>
-    <div id="quoteForm" style="display:none;">
-    <form action="" method="">
-        <input type="hidden" name="treeID" id="treeID" value="">
-        Initial Price: <input type="text" name="initialPrice"><br>
-        Time Window:<input type="text" name="timeWindow"><br>
-        <input type="submit" value="Submit Quote">
-    </form>
-</div>
-<script>
-function showQuoteForm(treeID) {
-    document.getElementById('treeID').value = treeID;
-    document.getElementById('quoteForm').style.display = 'block';
-}
-</script>
 	</div>
-
 </body>
 </html>
