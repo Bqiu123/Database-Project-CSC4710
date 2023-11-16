@@ -44,6 +44,34 @@
                 </tr>
             </c:forEach>
         </table>
+        
+        <table border="1" cellpadding="6">
+            <caption><h2>Quotes that require attention</h2></caption>
+            <tr>
+                <th>Quote Message ID</th>
+                <th>Client ID</th>
+                <th>Quote ID</th>
+                <th>Message Time</th>
+                <th>Quote Message</th>
+            </tr>
+            <c:forEach var="quoteMessage" items="${listAllQuoteMessages}">
+                <tr style="text-align:center">
+                    <td><c:out value="${quoteMessage.quoteMessageID}" /></td>
+                    <td><c:out value="${quoteMessage.userID}" /></td>
+                    <td><c:out value="${quoteMessage.quoteID}" /></td>
+                    <td><c:out value="${quoteMessage.msgTime}" /></td>
+                    <td><c:out value="${quoteMessage.note}" /></td>
+                    <td>
+			            <form action="processQuote.jsp" method="post">
+			                <input type="hidden" name="quoteMessageID" value="${quoteMessage.quoteMessageID}" />
+			                <input type="hidden" name="userID" value="${quoteMessage.userID}" />
+			                <input type="hidden" name="quoteID" value="${quoteMessage.quoteID}" />
+			                <button type="submit">Respond Quote</button>
+			            </form>
+			        </td>
+                </tr>
+            </c:forEach>
+        </table>
     </div>
 	</div>
 </body>

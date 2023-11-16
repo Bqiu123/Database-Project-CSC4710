@@ -45,7 +45,7 @@ public class userDAO
             } catch (ClassNotFoundException e) {
                 throw new SQLException(e);
             }
-            connect = (Connection) DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/testdb?allowPublicKeyRetrieval=true&useSSL=false&user=john&password=pass1234");
+            connect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/testdb?allowPublicKeyRetrieval=true&useSSL=false&user=john&password=pass1234");
             System.out.println(connect);
         }
     }
@@ -324,7 +324,7 @@ public class userDAO
     }
     
     
-    
+    	
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   //CRUD methods for Quote;
     public void insertQuote(Quote quote, String treeID) throws SQLException {
@@ -439,14 +439,33 @@ public class userDAO
     
     public boolean deleteQuote(String quoteID) throws SQLException{
     	String sql = "DELETE FROM Quote Where quoteID = ?";
-    	connect_func();
+    	String deleteQuoteMessage = "DELETE FROM QuoteMessages WHERE quoteID = ?";
+    	String deleteTreeQuote = "DELETE FROM Tree WHERE quoteID = ?";
     	
-    	preparedStatement = (PreparedStatement) connect.prepareStatement(sql);
-    	preparedStatement.setString(1, quoteID);
     	
-    	boolean rowDeleted = preparedStatement.executeUpdate() > 0;
-    	preparedStatement.close();
-    	return rowDeleted;
+    		try(PreparedStatement preparedStatementMessages = connect.prepareStatement(deleteQuoteMessage))
+    		{
+    			preparedStatementMessages.setString(1, quoteID);
+        		int rowsAffectedMessages = preparedStatementMessages.executeUpdate();
+        		
+        		try(PreparedStatement preparedStatementTree = connect.prepareStatement(deleteTreeQuote))
+        		{
+            		preparedStatementTree.setString(1, quoteID);
+                	int rowsAffectedTree = preparedStatementTree.executeUpdate();
+                	
+                	try(PreparedStatement preparedStatementQuote = connect.prepareStatement(sql))
+            		{
+                		preparedStatementQuote.setString(1, quoteID);
+                    	int rowsAffected = preparedStatementQuote.executeUpdate();
+                    	return rowsAffected > 0;
+            		}
+        		}
+   
+    	} catch (SQLException e)
+    	{
+    		e.printStackTrace();
+    		return false;
+    	}
     }
     
    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
@@ -599,8 +618,10 @@ public class userDAO
         PreparedStatement preparedStatement = null;
         try {
             connect_func();
+            System.out.println("1");
             String sql = "INSERT INTO Bills (orderID, price, discount, balance, status) VALUES (?, ?, ?, ?, ?)";
             preparedStatement = connect.prepareStatement(sql);
+            System.out.println("2");
 
             preparedStatement.setString(1, bill.getOrderID());
             preparedStatement.setString(2, bill.getPrice());
@@ -608,7 +629,9 @@ public class userDAO
             preparedStatement.setString(4, bill.getBalance());
             preparedStatement.setString(5, bill.getStatus());
 
+            System.out.println("3");
             preparedStatement.executeUpdate();
+            System.out.println("4");
         } catch (SQLException e) {
             throw e;
         } finally {

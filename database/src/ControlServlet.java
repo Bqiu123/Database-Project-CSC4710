@@ -212,7 +212,9 @@ public class ControlServlet extends HttpServlet {
 	    
 	    private void davidSmithDashBoard(HttpServletRequest request, HttpServletResponse response, String view) throws ServletException, IOException, SQLException{
 	    	List<Tree> listTreeWithoutQuote = userDAO.listTreesWithoutQuote();
+	    	List<QuoteMessages> listAllQuoteMessages = userDAO.listAllQuoteMessages();
 	        request.setAttribute("listTreeWithoutQuote", listTreeWithoutQuote);
+	    	request.setAttribute("listAllQuoteMessages", listAllQuoteMessages);
 	    	request.getRequestDispatcher("davidSmithDashboard.jsp").forward(request, response);
 	    }
 	    
@@ -414,9 +416,14 @@ public class ControlServlet extends HttpServlet {
 	                return;
 	            }
 
+	            System.out.println(quoteID);
+	            
 	            if ("agree".equals(responseAction)) {
+	            	System.out.println("agree started");
 	                Bills bill = new Bills("orderID", "price", "0", "balance", "Unpaid");
+	                System.out.println("Agree after bill import");
 	                userDAO.insertBill(bill);
+	                System.out.println("agree finished");
 	            } else if ("decline".equals(responseAction)) {
 	                userDAO.deleteQuote(quoteID);
 	            } else if ("negotiate".equals(responseAction)) {
