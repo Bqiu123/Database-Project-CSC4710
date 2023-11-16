@@ -19,6 +19,7 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.util.regex.Pattern;
+import java.time.LocalDateTime;
 
 
 public class ControlServlet extends HttpServlet {
@@ -60,6 +61,9 @@ public class ControlServlet extends HttpServlet {
         	case "/initialRequest":
         		initialRequest(request, response);
         		break;
+        	 case "/respondQuote":
+                 respondToQuote(request, response);
+                 break;
         	case "/initialize":
         		userDAO.init();
         		System.out.println("Database successfully initialized!");
@@ -233,20 +237,24 @@ public class ControlServlet extends HttpServlet {
 	    	 
 	    	 else if(userDAO.isValid(email, password)) 
 	    	 {
-			 	 String userID = userDAO.getUserIDByEmail(email);
-			 	 
-			 	 currentUser = email;
-			 	 session = request.getSession();
-			 	 session.setAttribute("userID", userID);
-			 	 session.setAttribute("username", email);
-				 System.out.println("Login Successful! Redirecting");
-				 request.getRequestDispatcher("activitypage.jsp").forward(request, response);
-			 			 			 			 
-	    	 }
-	    	 else {
-	    		 request.setAttribute("loginFailedStr","Login Failed: Wrong password or username.");
-	    		 request.getRequestDispatcher("login.jsp").forward(request, response);
-	    	 }
+	    		 String clientID = userDAO.getUserIDByEmail(email);
+	    	        HttpSession session = request.getSession();
+	    	        session.setAttribute("username", email); 
+	    	        session.setAttribute("userID", clientID);
+
+	    	        // Fetch quotes for this clientID
+	    	        userDAO userDAO = new userDAO();
+	    	        List<Quote> userQuotes = userDAO.getQuotesByClientID(clientID);
+	    	        session.setAttribute("userQuotes", userQuotes);
+
+	    	        // Redirect to activitypage.jsp
+	    	        RequestDispatcher dispatcher = request.getRequestDispatcher("activitypage.jsp");
+	    	        dispatcher.forward(request, response);
+	    	    } else {
+	    	        // Handle login failure
+	    	        request.setAttribute("loginFailedStr", "Login Failed: Wrong password or username.");
+	    	        request.getRequestDispatcher("login.jsp").forward(request, response);
+	    	    }
 	    }
 	           
 	    private void register(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
@@ -329,19 +337,16 @@ public class ControlServlet extends HttpServlet {
 	    	    request.getRequestDispatcher("processQuote.jsp").forward(request, response);
 	    	    return;
 	    	    }
-	    	// Get the status parameter, default to "pending" if not present
 	        String status = request.getParameter("status");
 	        if (status == null || status.isEmpty()) {
 	            status = "pending";
 	        }
 
-	        // Get the clientID parameter, default to null if not present
 	        String clientID = request.getParameter("clientID");
 	        if (clientID == null || clientID.isEmpty()) {
-	            clientID = null; // Or you can simply leave it as it is, since it defaults to null
+	            clientID = null;
 	        }
 
-	        // Get the contractorID parameter, default to "1" if not present
 	        String contractorID = request.getParameter("contractorID");
 	        if (contractorID == null || contractorID.isEmpty()) {
 	            contractorID = "1";
@@ -392,6 +397,45 @@ public class ControlServlet extends HttpServlet {
 	            
 	            request.getSession().setAttribute("successMessage", "Request Submitted Successfully. Please wait for a response.");
 	            response.sendRedirect("activitypage.jsp");
+	        }
+	    }
+
+
+	    private void respondToQuote(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	        String quoteID = request.getParameter("quoteID");
+	        String responseAction = request.getParameter("response");
+	        String userID = (String) request.getSession().getAttribute("userID");
+
+	        try {
+	            if (quoteID == null || quoteID.isEmpty() || responseAction == null || responseAction.isEmpty()) {
+	                // Set error message in request and forward to the form page
+	                request.setAttribute("errorMessage", "Quote ID and Response Action are required.");
+	                request.getRequestDispatcher("RespondQuote.jsp").forward(request, response);
+	                return;
+	            }
+
+	            if ("agree".equals(responseAction)) {
+	                Bills bill = new Bills("orderID", "price", "0", "balance", "Unpaid");
+	                userDAO.insertBill(bill);
+	            } else if ("decline".equals(responseAction)) {
+	                userDAO.deleteQuote(quoteID);
+	            } else if ("negotiate".equals(responseAction)) {
+	                String note = request.getParameter("note");
+	                if (note == null || note.isEmpty()) {
+	                    request.setAttribute("errorMessage", "Note is required for negotiation.");
+	                    request.getRequestDispatcher("RespondQuote.jsp").forward(request, response);
+	                    return;
+	                }
+	                String msgTime = LocalDateTime.now().toString();
+	                QuoteMessages quoteMessage = new QuoteMessages(userID, quoteID, msgTime, note);
+	                userDAO.insertQuoteMessage(quoteMessage);
+	            }
+
+	            request.getSession().setAttribute("successMessage", "Response to quote processed successfully.");
+	            response.sendRedirect("RespondQuote.jsp");
+	        } catch (SQLException e) {
+	            request.setAttribute("errorMessage", "Database access error: " + e.getMessage());
+	            request.getRequestDispatcher("RespondQuote.jsp").forward(request, response);
 	        }
 	    }
 

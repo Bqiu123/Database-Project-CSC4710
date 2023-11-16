@@ -457,16 +457,13 @@ public class userDAO
         PreparedStatement preparedStatement = null;
         try {
             connect_func(); 
-            String sql = "INSERT INTO QuoteMessages (userID, quoteID, msgTime, price, scheduleStart, scheduleEnd, note) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO QuoteMessages (userID, quoteID, msgTime, note) VALUES (?, ?, ?, ?)";
             preparedStatement = connect.prepareStatement(sql);
 
             preparedStatement.setString(1, quoteMessage.getUserID());
             preparedStatement.setString(2, quoteMessage.getQuoteID());
             preparedStatement.setString(3, quoteMessage.getMsgTime());
-            preparedStatement.setString(4, quoteMessage.getPrice());
-            preparedStatement.setString(5, quoteMessage.getScheduleStart());
-            preparedStatement.setString(6, quoteMessage.getScheduleEnd());
-            preparedStatement.setString(7, quoteMessage.getNote());
+            preparedStatement.setString(4, quoteMessage.getNote());
 
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
@@ -494,12 +491,9 @@ public class userDAO
                 String userID = resultSet.getString("userID");
                 String quoteID = resultSet.getString("quoteID");
                 String msgTime = resultSet.getString("msgTime");
-                String price = resultSet.getString("price");
-                String scheduleStart = resultSet.getString("scheduleStart");
-                String scheduleEnd = resultSet.getString("scheduleEnd");
                 String note = resultSet.getString("note");
 
-                QuoteMessages quoteMessage = new QuoteMessages(quoteMessageID, userID, quoteID, msgTime, price, scheduleStart, scheduleEnd, note);
+                QuoteMessages quoteMessage = new QuoteMessages(quoteMessageID, userID, quoteID, msgTime, note);
                 listQuoteMessage.add(quoteMessage);
             }
         } catch (SQLException e) {
@@ -533,12 +527,9 @@ public class userDAO
                 String userID = resultSet.getString("userID");
                 String quoteID = resultSet.getString("quoteID");
                 String msgTime = resultSet.getString("msgTime");
-                String price = resultSet.getString("price");
-                String scheduleStart = resultSet.getString("scheduleStart");
-                String scheduleEnd = resultSet.getString("scheduleEnd");
                 String note = resultSet.getString("note");
 
-                quoteMessage = new QuoteMessages(quoteMessageID, userID, quoteID, msgTime, price, scheduleStart, scheduleEnd, note);
+                quoteMessage = new QuoteMessages(quoteMessageID, userID, quoteID, msgTime, note);
             }
         } catch (SQLException e) {
             throw e;
@@ -558,18 +549,15 @@ public class userDAO
         PreparedStatement preparedStatement = null;
         try {
             connect_func(); 
-            String sql = "UPDATE QuoteMessages SET userID = ?, quoteID = ?, msgTime = ?, price = ?, scheduleStart = ?, scheduleEnd = ?, note = ? WHERE quoteMessageID = ?";
+            String sql = "UPDATE QuoteMessages SET userID = ?, quoteID = ?, msgTime = ?, note = ? WHERE quoteMessageID = ?";
 
             preparedStatement = connect.prepareStatement(sql);
 
             preparedStatement.setString(1, quoteMessage.getUserID());
             preparedStatement.setString(2, quoteMessage.getQuoteID());
             preparedStatement.setString(3, quoteMessage.getMsgTime());
-            preparedStatement.setString(4, quoteMessage.getPrice());
-            preparedStatement.setString(5, quoteMessage.getScheduleStart());
-            preparedStatement.setString(6, quoteMessage.getScheduleEnd());
-            preparedStatement.setString(7, quoteMessage.getNote());
-            preparedStatement.setString(8, quoteMessage.getQuoteMessageID());
+            preparedStatement.setString(4, quoteMessage.getNote());
+            preparedStatement.setString(5, quoteMessage.getQuoteMessageID());
 
             int rowsUpdated = preparedStatement.executeUpdate();
             return rowsUpdated > 0;
@@ -899,16 +887,14 @@ public class userDAO
         PreparedStatement preparedStatement = null;
         try {
             connect_func(); 
-            String sql = "INSERT INTO BillMessages (userID, billID, msgTime, price, scheduleStart, scheduleEnd, note) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO BillMessages (userID, billID, msgTime, price, note) VALUES (?, ?, ?, ?, ?)";
             preparedStatement = connect.prepareStatement(sql);
 
             preparedStatement.setString(1, billMessage.getUserID());
             preparedStatement.setString(2, billMessage.getBillID());
             preparedStatement.setString(3, billMessage.getMsgTime());
             preparedStatement.setString(4, billMessage.getPrice());
-            preparedStatement.setString(5, billMessage.getScheduleStart());
-            preparedStatement.setString(6, billMessage.getScheduleEnd());
-            preparedStatement.setString(7, billMessage.getNote());
+            preparedStatement.setString(5, billMessage.getNote());
 
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
@@ -937,11 +923,9 @@ public class userDAO
                 String billID = resultSet.getString("billID");
                 String msgTime = resultSet.getString("msgTime");
                 String price = resultSet.getString("price");
-                String scheduleStart = resultSet.getString("scheduleStart");
-                String scheduleEnd = resultSet.getString("scheduleEnd");
                 String note = resultSet.getString("note");
 
-                BillMessages billMessage = new BillMessages(billMessageID, userID, billID, msgTime, price, scheduleStart, scheduleEnd, note);
+                BillMessages billMessage = new BillMessages(billMessageID, userID, billID, msgTime, price, note);
                 listBillMessages.add(billMessage);
             }
         } catch (SQLException e) {
@@ -976,11 +960,9 @@ public class userDAO
                 String billID = resultSet.getString("billID");
                 String msgTime = resultSet.getString("msgTime");
                 String price = resultSet.getString("price");
-                String scheduleStart = resultSet.getString("scheduleStart");
-                String scheduleEnd = resultSet.getString("scheduleEnd");
                 String note = resultSet.getString("note");
 
-                billMessage = new BillMessages(billMessageID, userID, billID, msgTime, price, scheduleStart, scheduleEnd, note);
+                billMessage = new BillMessages(billMessageID, userID, billID, msgTime, price, note);
             }
         } catch (SQLException e) {
             throw e;
@@ -1000,7 +982,7 @@ public class userDAO
         PreparedStatement preparedStatement = null;
         try {
             connect_func(); 
-            String sql = "UPDATE BillMessages SET userID = ?, billID = ?, msgTime = ?, price = ?, scheduleStart = ?, scheduleEnd = ?, note = ? WHERE billMessageID = ?";
+            String sql = "UPDATE BillMessages SET userID = ?, billID = ?, msgTime = ?, price = ?, note = ? WHERE billMessageID = ?";
 
             preparedStatement = connect.prepareStatement(sql);
 
@@ -1008,10 +990,8 @@ public class userDAO
             preparedStatement.setString(2, billMessage.getBillID());
             preparedStatement.setString(3, billMessage.getMsgTime());
             preparedStatement.setString(4, billMessage.getPrice());
-            preparedStatement.setString(5, billMessage.getScheduleStart());
-            preparedStatement.setString(6, billMessage.getScheduleEnd());
-            preparedStatement.setString(7, billMessage.getNote());
-            preparedStatement.setString(8, billMessage.getBillMessageID());
+            preparedStatement.setString(5, billMessage.getNote());
+            preparedStatement.setString(6, billMessage.getBillMessageID());
 
             int rowsUpdated = preparedStatement.executeUpdate();
             return rowsUpdated > 0;
@@ -1048,7 +1028,39 @@ public class userDAO
     
     
     
-    
+    public List<Quote> getQuotesByClientID(String clientID) throws SQLException {
+        List<Quote> listQuote = new ArrayList<Quote>();
+        String sql = "SELECT * FROM Quote WHERE clientID = ?";
+        
+        try {
+            connect_func();
+            preparedStatement = connect.prepareStatement(sql);
+            preparedStatement.setString(1, clientID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String quoteID = resultSet.getString("quoteID");
+                String initialPrice = resultSet.getString("initialPrice");
+                String timeWindow = resultSet.getString("timeWindow");
+                String status = resultSet.getString("status");
+                String contractorID = resultSet.getString("contractorID");
+                
+                Quote quote = new Quote(quoteID, initialPrice, timeWindow, status, clientID, contractorID);
+                listQuote.add(quote);
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            disconnect();
+        }
+        return listQuote;
+    }
     
     
     
@@ -1152,6 +1164,8 @@ public class userDAO
         return id;
     }
 
+
+
     public List<Tree> listTreesWithoutQuote() throws SQLException {
         List<Tree> listTree = new ArrayList<>();
         String sql = "SELECT * FROM Tree WHERE quoteID IS NULL OR quoteID = ''";
@@ -1175,6 +1189,7 @@ public class userDAO
     }
 
     
+
     public void init() throws SQLException, FileNotFoundException, IOException{
     	connect_func();
         statement =  (Statement) connect.createStatement();
@@ -1231,10 +1246,7 @@ public class userDAO
 					          	"quoteMessageID INT AUTO_INCREMENT PRIMARY KEY, "+
 					        	"userID INTEGER, "+
 					          	"quoteID INTEGER, "+
-					        	"msgTime DATETIME, "+
-					          	"price DOUBLE, "+
-					        	"scheduleStart DATETIME, "+
-					          	"scheduleEnd DATETIME, "+
+					        	"msgTime DATETIME, "+	
 					        	"note VARCHAR(200), "+
 					          	"FOREIGN KEY(userID) REFERENCES User(id),"+
 					        	"FOREIGN KEY(quoteID) REFERENCES Quote(quoteID)"+
@@ -1262,8 +1274,6 @@ public class userDAO
 					            "billID INTEGER, "+
 					            "msgTime DATETIME, "+
 					            "price DOUBLE, "+
-					            "scheduleStart DATETIME, "+
-					            "scheduleEnd DATETIME, "+
 					            "note VARCHAR(200), "+
 					            "FOREIGN KEY(userID) REFERENCES User(id), "+
 					            "FOREIGN KEY(billID) REFERENCES Bills(billID)"+
@@ -1307,17 +1317,17 @@ public class userDAO
         				    "(4.8, 20, '456 Fir Avenue', 9, 8, NULL)," +
         				    "(7.1, 28, '789 Redwood Drive', 4, 9, NULL)," +
         				    "(3.0, 14, '321 Willow Way', 13, 10, NULL);"),
-        		 			("INSERT INTO QuoteMessages (userID, quoteID, msgTime, price, scheduleStart, scheduleEnd, note) VALUES" +
-        		 			"(1, 1, '2023-11-12 10:00:00', 200.50, '2023-11-15 08:00:00', '2023-11-16 18:00:00', 'First message note')," +
-        		 			"(2, 2, '2023-11-13 11:00:00', 150.75, '2023-11-20 09:00:00', '2023-11-21 17:00:00', 'Second message note')," +
-        		 			"(3, 3, '2023-11-14 12:00:00', 300.00, '2023-11-25 10:00:00', '2023-11-26 16:00:00', 'Third message note')," +
-        		 			"(4, 4, '2023-11-15 13:00:00', 175.25, '2023-12-01 08:00:00', '2023-12-02 18:00:00', 'Fourth message note')," +
-        		 			"(5, 5, '2023-11-16 14:00:00', 220.40, '2023-12-05 09:00:00', '2023-12-06 17:00:00', 'Fifth message note')," +
-        		 			"(6, 6, '2023-11-17 15:00:00', 180.90, '2023-12-10 10:00:00', '2023-12-11 16:00:00', 'Sixth message note')," +
-        		 			"(7, 7, '2023-11-18 16:00:00', 250.30, '2023-12-15 08:00:00', '2023-12-16 18:00:00', 'Seventh message note')," +
-        		 			"(8, 8, '2023-11-19 17:00:00', 160.00, '2023-12-20 09:00:00', '2023-12-21 17:00:00', 'Eighth message note')," +
-        		 			"(9, 9, '2023-11-20 18:00:00', 190.85, '2023-12-25 10:00:00', '2023-12-26 16:00:00', 'Ninth message note')," +
-        		 			"(10, 10, '2023-11-21 19:00:00', 210.60, '2023-12-30 08:00:00', '2023-12-31 18:00:00', 'Tenth message note');"),        		 			
+        		 			("INSERT INTO QuoteMessages (userID, quoteID, msgTime, note) VALUES" +
+        		 			"(1, 1, '2023-11-12 10:00:00', 'First message note')," +
+        		 			"(2, 2, '2023-11-13 11:00:00', 'Second message note')," +
+        		 			"(3, 3, '2023-11-14 12:00:00', 'Third message note')," +
+        		 			"(4, 4, '2023-11-15 13:00:00', 'Fourth message note')," +
+        		 			"(5, 5, '2023-11-16 14:00:00', 'Fifth message note')," +
+        		 			"(6, 6, '2023-11-17 15:00:00', 'Sixth message note')," +
+        		 			"(7, 7, '2023-11-18 16:00:00', 'Seventh message note')," +
+        		 			"(8, 8, '2023-11-19 17:00:00', 'Eighth message note')," +
+        		 			"(9, 9, '2023-11-20 18:00:00', 'Ninth message note')," +
+        		 			"(10, 10, '2023-11-21 19:00:00', 'Tenth message note');"),        		 			
         		 			("INSERT INTO Orders (quoteID, price, scheduleStart, scheduleEnd) VALUES" +
         		 			"(1, 200.50, '2023-11-15 08:00:00', '2023-11-16 18:00:00')," +
         		 			"(2, 150.75, '2023-11-20 09:00:00', '2023-11-21 17:00:00')," +
@@ -1340,17 +1350,17 @@ public class userDAO
         		 			"(8, 160.00, 8.00, 152.00, 'Unpaid')," +
         		 			"(9, 190.85, 9.50, 181.35, 'Paid')," +
         		 			"(10, 210.60, 10.50, 200.10, 'Unpaid');"),        		 			
-        		 			("INSERT INTO BillMessages (userID, billID, msgTime, price, scheduleStart, scheduleEnd, note) VALUES" +
-        		 			"(1, 1, '2023-11-12 10:30:00', 200.50, '2023-11-15 08:00:00', '2023-11-16 18:00:00', 'First bill message')," +
-        		 			"(2, 2, '2023-11-13 11:30:00', 150.75, '2023-11-20 09:00:00', '2023-11-21 17:00:00', 'Second bill message')," +
-        		 			"(3, 3, '2023-11-14 12:30:00', 300.00, '2023-11-25 10:00:00', '2023-11-26 16:00:00', 'Third bill message')," +
-        		 			"(4, 4, '2023-11-15 13:30:00', 175.25, '2023-12-01 08:00:00', '2023-12-02 18:00:00', 'Fourth bill message')," +
-        		 			"(5, 5, '2023-11-16 14:30:00', 220.40, '2023-12-05 09:00:00', '2023-12-06 17:00:00', 'Fifth bill message')," +
-        		 			"(6, 6, '2023-11-17 15:30:00', 180.90, '2023-12-10 10:00:00', '2023-12-11 16:00:00', 'Sixth bill message')," +
-        		 			"(7, 7, '2023-11-18 16:30:00', 250.30, '2023-12-15 08:00:00', '2023-12-16 18:00:00', 'Seventh bill message')," +
-        		 			"(8, 8, '2023-11-19 17:30:00', 160.00, '2023-12-20 09:00:00', '2023-12-21 17:00:00', 'Eighth bill message')," +
-        		 			"(9, 9, '2023-11-20 18:30:00', 190.85, '2023-12-25 10:00:00', '2023-12-26 16:00:00', 'Ninth bill message')," +
-        		 			"(10, 10, '2023-11-21 19:30:00', 210.60, '2023-12-30 08:00:00', '2023-12-31 18:00:00', 'Tenth bill message');"),
+        		 			("INSERT INTO BillMessages (userID, billID, msgTime, price, note) VALUES" +
+        		 			"(1, 1, '2023-11-12 10:30:00', 200.50, 'First bill message')," +
+        		 			"(2, 2, '2023-11-13 11:30:00', 150.75, 'Second bill message')," +
+        		 			"(3, 3, '2023-11-14 12:30:00', 300.00, 'Third bill message')," +
+        		 			"(4, 4, '2023-11-15 13:30:00', 175.25, 'Fourth bill message')," +
+        		 			"(5, 5, '2023-11-16 14:30:00', 220.40, 'Fifth bill message')," +
+        		 			"(6, 6, '2023-11-17 15:30:00', 180.90, 'Sixth bill message')," +
+        		 			"(7, 7, '2023-11-18 16:30:00', 250.30, 'Seventh bill message')," +
+        		 			"(8, 8, '2023-11-19 17:30:00', 160.00, 'Eighth bill message')," +
+        		 			"(9, 9, '2023-11-20 18:30:00', 190.85, 'Ninth bill message')," +
+        		 			"(10, 10, '2023-11-21 19:30:00', 210.60, 'Tenth bill message');"),
 
 			    			};
         

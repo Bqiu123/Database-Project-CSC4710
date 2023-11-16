@@ -1,37 +1,36 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Respond to Quote</title>
-    <!-- Add your CSS and JS files here -->
-</head>
+<head><title>Respond to Quote</title></head>
 <body>
-    <h1>Respond to Quote</h1>
-    <!-- Assuming the quote details are passed to this JSP -->
-    <p>Quote: [Quote Details]</p> <!-- Replace [Quote Details] with the actual quote details -->
-    <form action="ControlServlet" method="post">
-        <input type="hidden" name="action" value="respondToQuote">
-        <input type="hidden" name="quoteId" value="[Quote ID]"> <!-- Replace [Quote ID] with the actual quote ID -->
+    <h2>Respond to Quote</h2>
+    <form action="respondQuote" >
+        <input type="hidden" name="quoteID" value="${param.quoteID}" />
         <input type="radio" id="agree" name="response" value="agree">
         <label for="agree">Agree</label><br>
+        <input type="radio" id="decline" name="response" value="decline">
+        <label for="decline">Decline</label><br>
         <input type="radio" id="negotiate" name="response" value="negotiate">
         <label for="negotiate">Negotiate</label><br>
-        <input type="radio" id="reject" name="response" value="reject">
-        <label for="reject">Reject</label><br>
-
-        <div id="negotiationDetails" style="display:none;">
-            New Price: <input type="text" name="newPrice"><br>
-            Time Window: <input type="text" name="timeWindow"><br>
+        <div id="negotiateOptions" style="display:none;">
+            <select name="reason">
+                <option value="time">Time</option>
+                <option value="price">Price</option>
+            </select>
+            <textarea name="note" rows="4" cols="50"></textarea>
         </div>
-
         <input type="submit" value="Submit Response">
     </form>
-
+<a href="login.jsp" target="_self">Return to Login Page</a>
     <script>
-        // Simple script to toggle negotiation details
-        document.getElementById('negotiate').onchange = function() {
-            document.getElementById('negotiationDetails').style.display = this.checked ? 'block' : 'none';
+        document.getElementById("negotiate").onclick = function() {
+            document.getElementById("negotiateOptions").style.display = 'block';
+        };
+        document.getElementById("agree").onclick = function() {
+            document.getElementById("negotiateOptions").style.display = 'none';
+        };
+        document.getElementById("decline").onclick = function() {
+            document.getElementById("negotiateOptions").style.display = 'none';
         };
     </script>
 </body>

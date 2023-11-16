@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
+ <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+    
 <!DOCTYPE html>
 <html>
 <head><title>Initial Request</title></head>
@@ -55,7 +57,31 @@
 					</td>
 				</tr>
 			</table>
-			<a href="login.jsp" target="_self">Return to Login Page</a>
 		</form>
+		<h2>Your Quotes</h2>
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Quote ID</th>
+            <th>Initial Price</th>
+            <th>Time Window</th>
+            <th>Status</th>
+        </tr>
+        <c:forEach var="quote" items="${sessionScope.userQuotes}">
+            <tr>
+                <td><c:out value="${quote.quoteID}" /></td>
+                <td><c:out value="${quote.initialPrice}" /></td>
+                <td><c:out value="${quote.timeWindow}" /></td>
+                <td><c:out value="${quote.status}" /></td>
+                <td>
+            <form action="RespondQuote.jsp">
+                <input type="hidden" name="quoteID" value="${quote.quoteID}" />
+                <input type="submit" value="Respond Quote" />
+            </form>
+        </td>
+            </tr>
+        </c:forEach>
+    </table>
+<a href="login.jsp" target="_self">Return to Login Page</a>
+		
 	</div>
 </body>

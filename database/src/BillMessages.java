@@ -4,8 +4,6 @@ public class BillMessages {
     private String billID;        // Corresponds to billID INTEGER
     private String msgTime;       // Corresponds to msgTime DATETIME
     private String price;         // Corresponds to price DOUBLE
-    private String scheduleStart; // Corresponds to scheduleStart DATETIME
-    private String scheduleEnd;   // Corresponds to scheduleEnd DATETIME
     private String note;          // Corresponds to note VARCHAR(200)
 
     // Constructors
@@ -16,24 +14,20 @@ public class BillMessages {
         this.billMessageID = billMessageID;
     }
 
-    public BillMessages(String billMessageID, String userID, String billID, String msgTime, String price, String scheduleStart, String scheduleEnd, String note) {
+    public BillMessages(String billMessageID, String userID, String billID, String msgTime, String price, String note) {
         this.billMessageID = billMessageID;
         this.userID = userID;
         this.billID = billID;
         this.msgTime = msgTime;
         this.price = price;
-        this.scheduleStart = scheduleStart;
-        this.scheduleEnd = scheduleEnd;
         this.note = note;
     }
 
-    public BillMessages(String userID, String billID, String msgTime, String price, String scheduleStart, String scheduleEnd, String note) {
+    public BillMessages(String userID, String billID, String msgTime, String price, String note) {
         this.userID = userID;
         this.billID = billID;
         this.msgTime = msgTime;
         this.price = price;
-        this.scheduleStart = scheduleStart;
-        this.scheduleEnd = scheduleEnd;
         this.note = note;
     }
 
@@ -78,21 +72,6 @@ public class BillMessages {
         this.price = price;
     }
 
-    public String getScheduleStart() {
-        return scheduleStart;
-    }
-
-    public void setScheduleStart(String scheduleStart) {
-        this.scheduleStart = scheduleStart;
-    }
-
-    public String getScheduleEnd() {
-        return scheduleEnd;
-    }
-
-    public void setScheduleEnd(String scheduleEnd) {
-        this.scheduleEnd = scheduleEnd;
-    }
 
     public String getNote() {
         return note;
