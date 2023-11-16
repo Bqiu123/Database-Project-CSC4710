@@ -111,9 +111,6 @@
                 <th>User ID</th>
                 <th>Quote ID</th>
                 <th>Message Time</th>
-                <th>Price</th>
-                <th>Schedule Start</th>
-                <th>Schedule End</th>
                 <th>Note</th>
             </tr>
             <c:forEach var="quoteMessage" items="${listQuoteMessages}">
@@ -122,9 +119,6 @@
                     <td><c:out value="${quoteMessage.userID}" /></td>
                     <td><c:out value="${quoteMessage.quoteID}" /></td>
                     <td><c:out value="${quoteMessage.msgTime}" /></td>
-                    <td><c:out value="${quoteMessage.price}" /></td>
-                    <td><c:out value="${quoteMessage.scheduleStart}" /></td>
-                    <td><c:out value="${quoteMessage.scheduleEnd}" /></td>
                     <td><c:out value="${quoteMessage.note}" /></td>
                 </tr>
             </c:forEach>
@@ -192,8 +186,6 @@
                 <th>Bill ID</th>
                 <th>Message Time</th>
                 <th>Price</th>
-                <th>Schedule Start</th>
-                <th>Schedule End</th>
                 <th>Note</th>
             </tr>
             <c:forEach var="billMessage" items="${listBillMessages}">
@@ -203,8 +195,6 @@
                     <td><c:out value="${billMessage.billID}" /></td>
                     <td><c:out value="${billMessage.msgTime}" /></td>
                     <td><c:out value="${billMessage.price}" /></td>
-                    <td><c:out value="${billMessage.scheduleStart}" /></td>
-                    <td><c:out value="${billMessage.scheduleEnd}" /></td>
                     <td><c:out value="${billMessage.note}" /></td>
                 </tr>
             </c:forEach>

@@ -4,9 +4,6 @@ public class QuoteMessages
 	protected String userID;
 	protected String quoteID;
 	protected String msgTime;
-	protected String price;
-	protected String scheduleStart;
-	protected String scheduleEnd;
 	protected String note;
 	
 	//Constructors
@@ -17,20 +14,17 @@ public class QuoteMessages
 		this.quoteMessageID = quoteMessageID;
 	}
 	
-	public QuoteMessages(String quoteMessageID, String userID, String quoteID, String msgTime, String price, String scheduleStart, String scheduleEnd, String note)
+	public QuoteMessages(String quoteMessageID, String userID, String quoteID, String msgTime, String note)
 	{
-		this(userID, quoteID, msgTime, price, scheduleStart, scheduleEnd, note);
+		this(userID, quoteID, msgTime, note);
 		this.quoteMessageID = quoteMessageID;
 	}
 	
-	public QuoteMessages(String userID, String quoteID, String msgTime, String price, String scheduleStart, String scheduleEnd, String note)
+	public QuoteMessages(String userID, String quoteID, String msgTime, String note)
 	{
 		this.userID = userID;
 		this.quoteID = quoteID;
 		this.msgTime = msgTime;
-		this.price = price;
-		this.scheduleStart = scheduleStart;
-		this.scheduleEnd = scheduleEnd;
 		this.note = note;
 	}
 	
@@ -68,33 +62,6 @@ public class QuoteMessages
 
     public void setMsgTime(String msgTime) {
         this.msgTime = msgTime;
-    }
-
-    // Getter and setter for price
-    public String getPrice() {
-        return price;
-    }
-
-    public void setPrice(String price) {
-        this.price = price;
-    }
-
-    // Getter and setter for scheduleStart
-    public String getScheduleStart() {
-        return scheduleStart;
-    }
-
-    public void setScheduleStart(String scheduleStart) {
-        this.scheduleStart = scheduleStart;
-    }
-
-    // Getter and setter for scheduleEnd
-    public String getScheduleEnd() {
-        return scheduleEnd;
-    }
-
-    public void setScheduleEnd(String scheduleEnd) {
-        this.scheduleEnd = scheduleEnd;
     }
 
     // Getter and setter for note
