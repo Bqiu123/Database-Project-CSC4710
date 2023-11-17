@@ -439,14 +439,33 @@ public class userDAO
     
     public boolean deleteQuote(String quoteID) throws SQLException{
     	String sql = "DELETE FROM Quote Where quoteID = ?";
-    	connect_func();
+    	String deleteQuoteMessage = "DELETE FROM QuoteMessages WHERE quoteID = ?";
+    	String deleteTreeQuote = "DELETE FROM Tree WHERE quoteID = ?";
     	
-    	preparedStatement = (PreparedStatement) connect.prepareStatement(sql);
-    	preparedStatement.setString(1, quoteID);
     	
-    	boolean rowDeleted = preparedStatement.executeUpdate() > 0;
-    	preparedStatement.close();
-    	return rowDeleted;
+    		try(PreparedStatement preparedStatementMessages = connect.prepareStatement(deleteQuoteMessage))
+    		{
+    			preparedStatementMessages.setString(1, quoteID);
+        		int rowsAffectedMessages = preparedStatementMessages.executeUpdate();
+        		
+        		try(PreparedStatement preparedStatementTree = connect.prepareStatement(deleteTreeQuote))
+        		{
+            		preparedStatementTree.setString(1, quoteID);
+                	int rowsAffectedTree = preparedStatementTree.executeUpdate();
+                	
+                	try(PreparedStatement preparedStatementQuote = connect.prepareStatement(sql))
+            		{
+                		preparedStatementQuote.setString(1, quoteID);
+                    	int rowsAffected = preparedStatementQuote.executeUpdate();
+                    	return rowsAffected > 0;
+            		}
+        		}
+   
+    	} catch (SQLException e)
+    	{
+    		e.printStackTrace();
+    		return false;
+    	}
     }
     
    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
@@ -1188,7 +1207,54 @@ public class userDAO
         return listTree;
     }
 
-    
+    public List<QuoteMessageWithPrice> listAllQuoteMessagesWithPrice() throws SQLException {
+        List<QuoteMessageWithPrice> list = new ArrayList<>();
+        String sql = "SELECT qm.quoteMessageID, qm.userID, qm.quoteID, qm.msgTime, qm.note, q.initialPrice " +
+                     "FROM QuoteMessages qm INNER JOIN Quote q ON qm.quoteID = q.quoteID";
+
+        connect_func(); // Ensure connection is open
+        try (Statement statement = connect.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+
+            while (resultSet.next()) {
+                QuoteMessageWithPrice qmwp = new QuoteMessageWithPrice(
+                    resultSet.getString("quoteMessageID"),
+                    resultSet.getString("userID"),
+                    resultSet.getString("quoteID"),
+                    resultSet.getString("msgTime"),
+                    resultSet.getString("note"),
+                    resultSet.getDouble("initialPrice")
+                );
+                list.add(qmwp);
+            }
+        }
+        return list;
+    }
+
+    public void updateQuoteDetails(String quoteID, String newPrice, String newTimeWindow) throws SQLException {
+        String sql = "UPDATE Quote SET ";
+
+        List<String> updates = new ArrayList<>();
+        if (newPrice != null && !newPrice.trim().isEmpty()) {
+            updates.add("initialPrice = " + newPrice);
+        }
+        if (newTimeWindow != null && !newTimeWindow.trim().isEmpty()) {
+            updates.add("timeWindow = '" + newTimeWindow + "'");
+        }
+        sql += String.join(", ", updates);
+        sql += " WHERE quoteID = ?";
+
+        if (!updates.isEmpty()) {
+            connect_func();
+            try (PreparedStatement preparedStatement = connect.prepareStatement(sql)) {
+                preparedStatement.setInt(1, Integer.parseInt(quoteID));
+                preparedStatement.executeUpdate();
+            } finally {
+                disconnect();
+            }
+        }
+    }
+
 
     public void init() throws SQLException, FileNotFoundException, IOException{
     	connect_func();
