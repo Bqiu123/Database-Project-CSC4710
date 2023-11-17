@@ -45,6 +45,35 @@
             </c:forEach>
         </table>
     </div>
+     <h1>Quote Messages with Price</h1>
+    <table border="1" cellpadding="6">
+        <caption><h2>List of Quote Messages</h2></caption>
+        <tr>
+            <th>Message ID</th>
+            <th>User ID</th>
+            <th>Quote ID</th>
+            <th>Message Time</th>
+            <th>Note</th>
+            <th>Price</th>
+            <th>Action</th>
+        </tr>
+        <c:forEach var="quoteMessage" items="${listAllQuoteMessagesWithPrice}">
+            <tr style="text-align:center">
+                <td><c:out value="${quoteMessage.quoteMessageID}" /></td>
+                <td><c:out value="${quoteMessage.userID}" /></td>
+                <td><c:out value="${quoteMessage.quoteID}" /></td>
+                <td><c:out value="${quoteMessage.msgTime}" /></td>
+                <td><c:out value="${quoteMessage.note}" /></td>
+                <td><c:out value="${quoteMessage.initialPrice}" /></td>
+                <td>
+                    <form action="DavidSmithRespond.jsp" method="post">
+    					<input type="hidden" name="quoteID" value="${quoteMessage.quoteID}" />
+    					<button type="submit">Respond</button>
+					</form>
+                </td>
+            </tr>
+        </c:forEach>
+    </table>
 	</div>
 </body>
 </html>

@@ -75,6 +75,9 @@ public class ControlServlet extends HttpServlet {
         	case "/davidSmith":
         		davidSmithDashBoard(request, response, "");
         		break;
+        	case "/updateQuote":
+                updateQuoteDetails(request, response);
+                break;
         	case "/logout":
         		logout(request,response);
         		break;
@@ -213,6 +216,8 @@ public class ControlServlet extends HttpServlet {
 	    private void davidSmithDashBoard(HttpServletRequest request, HttpServletResponse response, String view) throws ServletException, IOException, SQLException{
 	    	List<Tree> listTreeWithoutQuote = userDAO.listTreesWithoutQuote();
 	        request.setAttribute("listTreeWithoutQuote", listTreeWithoutQuote);
+	        List<QuoteMessageWithPrice>listAllQuoteMessagesWithPrice = userDAO.listAllQuoteMessagesWithPrice();
+	        request.setAttribute("listAllQuoteMessagesWithPrice", listAllQuoteMessagesWithPrice);
 	    	request.getRequestDispatcher("davidSmithDashboard.jsp").forward(request, response);
 	    }
 	    
@@ -439,6 +444,21 @@ public class ControlServlet extends HttpServlet {
 	        }
 	    }
 
+	    private void updateQuoteDetails(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	        String quoteID = request.getParameter("quoteID");
+	        String newPrice = request.getParameter("price");
+	        String newTimeWindow = request.getParameter("timeWindow");
+
+	        try {
+	            userDAO.updateQuoteDetails(quoteID, newPrice, newTimeWindow);
+	            request.setAttribute("message", "Quote updated successfully");
+	            RequestDispatcher dispatcher = request.getRequestDispatcher("davidSmithDashboard.jsp");
+	            davidSmithDashBoard(request, response, "");
+	            dispatcher.forward(request, response);
+	        } catch (SQLException e) {
+	            throw new ServletException("Database access error: " + e.getMessage(), e);
+	        }
+	    }
 	    
 	    private void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	    	currentUser = "";
