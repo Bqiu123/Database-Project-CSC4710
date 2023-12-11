@@ -332,13 +332,14 @@ public class userDAO
         ResultSet generatedKeys = null;
         try {
             connect_func(); // Connect to the database
-            String insertSql = "INSERT INTO Quote (initialPrice, timeWindow, status, clientID, contractorID) VALUES (?, ?, ?, ?, ?)";
+            String insertSql = "INSERT INTO Quote (initialPrice, scheduleStart, scheduleEnd, status, clientID, contractorID) VALUES (?, ?, ?, ?, ?, ?)";
             preparedStatement = connect.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, quote.getInitialPrice());
-            preparedStatement.setString(2, quote.getTimeWindow());
-            preparedStatement.setString(3, quote.getStatus());
-            preparedStatement.setString(4, quote.getClientID());
-            preparedStatement.setString(5, quote.getContractorID());
+            preparedStatement.setString(2, quote.getScheduleStart());
+            preparedStatement.setString(3, quote.getScheduleEnd());
+            preparedStatement.setString(4, quote.getStatus());
+            preparedStatement.setString(5, quote.getClientID());
+            preparedStatement.setString(6, quote.getContractorID());
             int affectedRows = preparedStatement.executeUpdate();
 
             if (affectedRows == 0) {
@@ -381,12 +382,13 @@ public class userDAO
     	while(resultSet.next()) {
     		String quoteID = resultSet.getString("quoteID");
     		String initialPrice = resultSet.getString("initialPrice");
-    		String timeWindow = resultSet.getString("timeWindow");
+    		String scheduleStart = resultSet.getString("scheduleStart");
+    		String scheduleEnd = resultSet.getString("scheduleEnd");
     		String status = resultSet.getString("status");
     		String clientID = resultSet.getString("clientID");
     		String contractorID = resultSet.getString("contractorID");
     		
-    		Quote quote = new Quote(quoteID, initialPrice, timeWindow, status, clientID, contractorID);
+    		Quote quote = new Quote(quoteID, initialPrice, scheduleStart, scheduleEnd, status, clientID, contractorID);
     		listQuote.add(quote);
     	}
     	resultSet.close();
@@ -407,12 +409,13 @@ public class userDAO
     	
     	if (resultSet.next()) {
     		String initialPrice = resultSet.getString("intialPrice");
-    		String timeWindow = resultSet.getString("timeWindow");
+    		String scheduleStart = resultSet.getString("scheduleStart");
+    		String scheduleEnd = resultSet.getString("scheduleEnd");
     		String status = resultSet.getString("status");
     		String clientID = resultSet.getString("clientID");
     		String contractorID = resultSet.getString("contractorID");
     		
-    		quote = new Quote(quoteID, initialPrice, timeWindow, status, clientID, contractorID);
+    		quote = new Quote(quoteID, initialPrice, scheduleStart, scheduleEnd, status, clientID, contractorID);
     		
     	}
     	resultSet.close();
@@ -423,14 +426,15 @@ public class userDAO
     
     public boolean updateQuote(Quote quote) throws SQLException{
     	PreparedStatement preparedStatement = null;
-    	String sql = "update Quote set initialPrice = ?, timeWindow = ?,status = ?, clientID = ?,contractorID = ?, where quoteID = ?";
+    	String sql = "update Quote set initialPrice = ?, scheduleStart = ?, scheduleEnd = ?, status = ?, clientID = ?,contractorID = ?, where quoteID = ?";
     	connect_func();
     	preparedStatement = connect.prepareStatement(sql);
     	preparedStatement.setString(1, quote.getInitialPrice());
-    	preparedStatement.setString(2, quote.getTimeWindow());
-    	preparedStatement.setString(3, quote.getStatus());
-    	preparedStatement.setString(4, quote.getClientID());
-    	preparedStatement.setString(5, quote.getContractorID());
+    	preparedStatement.setString(2, quote.getScheduleStart());
+    	preparedStatement.setString(3, quote.getScheduleEnd());
+    	preparedStatement.setString(4, quote.getStatus());
+    	preparedStatement.setString(5, quote.getClientID());
+    	preparedStatement.setString(6, quote.getContractorID());
     	
     	boolean rowUpdated = preparedStatement.executeUpdate() > 0;
     	preparedStatement.close();
@@ -1060,11 +1064,12 @@ public class userDAO
             while (resultSet.next()) {
                 String quoteID = resultSet.getString("quoteID");
                 String initialPrice = resultSet.getString("initialPrice");
-                String timeWindow = resultSet.getString("timeWindow");
+                String scheduleStart = resultSet.getString("scheduleStart");
+                String scheduleEnd = resultSet.getString("scheduleEnd");
                 String status = resultSet.getString("status");
                 String contractorID = resultSet.getString("contractorID");
                 
-                Quote quote = new Quote(quoteID, initialPrice, timeWindow, status, clientID, contractorID);
+                Quote quote = new Quote(quoteID, initialPrice, scheduleStart, scheduleEnd, status, clientID, contractorID);
                 listQuote.add(quote);
             }
         } catch (SQLException e) {
@@ -1231,15 +1236,18 @@ public class userDAO
         return list;
     }
 
-    public void updateQuoteDetails(String quoteID, String newPrice, String newTimeWindow) throws SQLException {
+    public void updateQuoteDetails(String quoteID, String newPrice, String newScheduleStart, String newScheduleEnd) throws SQLException {
         String sql = "UPDATE Quote SET ";
 
         List<String> updates = new ArrayList<>();
         if (newPrice != null && !newPrice.trim().isEmpty()) {
             updates.add("initialPrice = " + newPrice);
         }
-        if (newTimeWindow != null && !newTimeWindow.trim().isEmpty()) {
-            updates.add("timeWindow = '" + newTimeWindow + "'");
+        if (newScheduleStart != null && !newScheduleStart.trim().isEmpty()) {
+            updates.add("scheduleStart = '" + newScheduleStart + "'");
+        }
+        if (newScheduleEnd != null && !newScheduleEnd.trim().isEmpty()) {
+            updates.add("scheduleEnd = '" + newScheduleEnd + "'");
         }
         sql += String.join(", ", updates);
         sql += " WHERE quoteID = ?";
@@ -1254,6 +1262,33 @@ public class userDAO
             }
         }
     }
+
+    public void agreeToQuote(String quoteID, String price, String scheduleStart, String scheduleEnd) throws SQLException {
+        try {
+            connect_func(); // Connect to the database
+
+            // Insert a new order
+            String insertOrderSql = "INSERT INTO Orders (quoteID, price, scheduleStart, scheduleEnd) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement insertOrderStmt = connect.prepareStatement(insertOrderSql)) {
+                insertOrderStmt.setString(1, quoteID);
+                insertOrderStmt.setString(2, price);
+                insertOrderStmt.setString(3, scheduleStart);
+                insertOrderStmt.setString(4, scheduleEnd);
+                insertOrderStmt.executeUpdate();
+            }
+
+            // Update the quote status
+            String updateQuoteSql = "UPDATE Quote SET status = 'Confirmed' WHERE quoteID = ?";
+            try (PreparedStatement updateQuoteStmt = connect.prepareStatement(updateQuoteSql)) {
+                updateQuoteStmt.setString(1, quoteID);
+                updateQuoteStmt.executeUpdate();
+            }
+        } finally {
+            disconnect();
+        }
+    }
+
+
 
 
     public void init() throws SQLException, FileNotFoundException, IOException{
@@ -1290,7 +1325,8 @@ public class userDAO
 					        "CREATE TABLE if not exists Quote(" +
 					        	"quoteID INT AUTO_INCREMENT PRIMARY KEY, " +
 					            "initialPrice DOUBLE, " +
-					            "timeWindow VARCHAR(255), " +
+					            "scheduleStart DATE, "+
+					            "scheduleEnd DATE, "+
 					            "status VARCHAR(50), " +
 					            "clientID INT, " +
 					            "contractorID INT, "+
@@ -1321,8 +1357,8 @@ public class userDAO
 					            "orderID INT AUTO_INCREMENT PRIMARY KEY, "+
 					        	"quoteID INTEGER, "+
 					            "price DOUBLE, "+
-					        	"scheduleStart DATETIME, "+
-					            "scheduleEnd DATETIME, "+
+					        	"scheduleStart DATE, "+
+					            "scheduleEnd DATE, "+
 					            "FOREIGN KEY(quoteID) REFERENCES Quote(quoteID)"+
 					         ");",
 					         "CREATE TABLE if not exists Bills( "+
@@ -1361,17 +1397,17 @@ public class userDAO
 			    			"(id,'rudy@gmail.com', 'Rudy', 'Smith','rudy1234', '0860-6191-8026-5295','408-200-2252', 'Client', '1234', 'sign street', 'samo ne tu','MH', '09876'),"+
 			    			"(id,'jeannette@gmail.com', 'Jeannette ', 'Stone','jeannette1234', '7738-9880-5284-3227','606-059-0950', 'Client', '0981', 'snoop street', 'kojik', 'HW', '87654'),"+
 			    			"(id, 'susie@gmail.com', 'Susie ', 'Guzman', 'susie1234', '2038-7418-0996-1404','215-638-3029', 'Client', '1234', 'whatever street', 'detroit', 'MI', '48202');"),
-			        		("INSERT INTO Quote (initialPrice, timeWindow, status, clientID, contractorID) VALUES" +
-			    		 	"(200.50, '2023-11-15 to 2023-11-16', 'Pending', 1, 1),"+
-			    		 	"(150.75, '2023-11-20 to 2023-11-21', 'Confirmed', 2, 1),"+
-			    		 	"(300.00, '2023-11-25 to 2023-11-26', 'Pending', 3, 1),"+
-			    		 	"(175.25, '2023-12-01 to 2023-12-02', 'Confirmed', 4, 1),"+
-			    		 	"(220.40, '2023-12-05 to 2023-12-06', 'Pending', 5, 1),"+
-			    		 	"(180.90, '2023-12-10 to 2023-12-11', 'Confirmed', 6, 1),"+
-			    		 	"(250.30, '2023-12-15 to 2023-12-16', 'Pending', 7, 1),"+
-			    		 	"(160.00, '2023-12-20 to 2023-12-21', 'Confirmed', 8, 1),"+
-			    		 	"(190.85, '2023-12-25 to 2023-12-26', 'Pending', 9, 1),"+
-			    		 	"(210.60, '2023-12-30 to 2023-12-31', 'Confirmed', 10, 1);"),
+			        		("INSERT INTO Quote (initialPrice, scheduleStart, scheduleEnd, status, clientID, contractorID) VALUES" +
+			    		 	"(200.50, '2023-11-15', '2023-11-16', 'Pending', 1, 1),"+
+			    		 	"(150.75, '2023-11-20', '2023-11-21', 'Confirmed', 2, 1),"+
+			    		 	"(300.00, '2023-11-25', '2023-11-26', 'Pending', 3, 1),"+
+			    		 	"(175.25, '2023-12-01', '2023-12-02', 'Confirmed', 4, 1),"+
+			    		 	"(220.40, '2023-12-05', '2023-12-06', 'Pending', 5, 1),"+
+			    		 	"(180.90, '2023-12-10', '2023-12-11', 'Confirmed', 6, 1),"+
+			    		 	"(250.30, '2023-12-15', '2023-12-16', 'Pending', 7, 1),"+
+			    		 	"(160.00, '2023-12-20', '2023-12-21', 'Confirmed', 8, 1),"+
+			    		 	"(190.85, '2023-12-25', '2023-12-26', 'Pending', 9, 1),"+
+			    		 	"(210.60, '2023-12-30', '2023-12-31', 'Confirmed', 10, 1);"),
         		 			("INSERT INTO Tree (size, height, location, proximityToHouse, clientID, quoteID) VALUES" +
         				    "(5.5, 20, '123 Oak Street', 10, 1, 1)," +
         				    "(3.2, 15, '456 Pine Lane', 15, 2, 2)," +
@@ -1395,16 +1431,16 @@ public class userDAO
         		 			"(9, 9, '2023-11-20 18:00:00', 'Ninth message note')," +
         		 			"(10, 10, '2023-11-21 19:00:00', 'Tenth message note');"),        		 			
         		 			("INSERT INTO Orders (quoteID, price, scheduleStart, scheduleEnd) VALUES" +
-        		 			"(1, 200.50, '2023-11-15 08:00:00', '2023-11-16 18:00:00')," +
-        		 			"(2, 150.75, '2023-11-20 09:00:00', '2023-11-21 17:00:00')," +
-        		 			"(3, 300.00, '2023-11-25 10:00:00', '2023-11-26 16:00:00')," +
-        		 			"(4, 175.25, '2023-12-01 08:00:00', '2023-12-02 18:00:00')," +
-        		 			"(5, 220.40, '2023-12-05 09:00:00', '2023-12-06 17:00:00')," +
-        		 			"(6, 180.90, '2023-12-10 10:00:00', '2023-12-11 16:00:00')," +
-        		 			"(7, 250.30, '2023-12-15 08:00:00', '2023-12-16 18:00:00')," +
-        		 			"(8, 160.00, '2023-12-20 09:00:00', '2023-12-21 17:00:00')," +
-        		 			"(9, 190.85, '2023-12-25 10:00:00', '2023-12-26 16:00:00')," +
-        		 			"(10, 210.60, '2023-12-30 08:00:00', '2023-12-31 18:00:00');"),       		 			
+        		 			"(1, 200.50, '2023-11-15', '2023-11-16')," +
+        		 			"(2, 150.75, '2023-11-20', '2023-11-21')," +
+        		 			"(3, 300.00, '2023-11-25', '2023-11-26')," +
+        		 			"(4, 175.25, '2023-12-01', '2023-12-02')," +
+        		 			"(5, 220.40, '2023-12-05', '2023-12-06')," +
+        		 			"(6, 180.90, '2023-12-10', '2023-12-11')," +
+        		 			"(7, 250.30, '2023-12-15', '2023-12-16')," +
+        		 			"(8, 160.00, '2023-12-20', '2023-12-21')," +
+        		 			"(9, 190.85, '2023-12-25', '2023-12-26')," +
+        		 			"(10, 210.60, '2023-12-30', '2023-12-31');"),       		 			
         		 			("INSERT INTO Bills (orderID, price, discount, balance, status) VALUES" +
         		 			"(1, 200.50, 10.00, 190.50, 'Unpaid')," +
         		 			"(2, 150.75, 5.00, 145.75, 'Unpaid')," +

@@ -83,7 +83,8 @@
             <tr>
                 <th>Quote ID</th>
                 <th>Initial Price</th>
-                <th>Time Window</th>
+                <th>Schedule Start</th>
+                <th>Schedule End</th>
                 <th>Status</th>
                 <th>Client ID</th>
                 <th>Contractor ID</th>
@@ -92,7 +93,8 @@
                 <tr style="text-align:center">
                     <td><c:out value="${quote.quoteID}" /></td>
                     <td><c:out value="${quote.initialPrice}" /></td>
-                    <td><c:out value="${quote.timeWindow}" /></td>
+                    <td><c:out value="${quote.scheduleStart}" /></td>
+                    <td><c:out value="${quote.scheduleEnd}" /></td>
                     <td><c:out value="${quote.status}" /></td>
                     <td><c:out value="${quote.clientID}" /></td>
                     <td><c:out value="${quote.contractorID}" /></td>

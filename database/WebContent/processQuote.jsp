@@ -24,9 +24,15 @@
 					</td>
 				</tr>
 				<tr>
-					<th>Time Window: </th>
+					<th>Schedule Start: </th>
 					<td align="center" colspan="3">
-						<input type="text" name="timeWindow" size="45" value="" onfocus="this.value=''">
+						<input type="text" name="scheduleStart" size="45" value="" onfocus="this.value=''">
+					</td>
+				</tr>
+				<tr>
+					<th>Schedule End: </th>
+					<td align="center" colspan="3">
+						<input type="text" name="scheduleEnd" size="45" value="" onfocus="this.value=''">
 					</td>
 				</tr>
 				<tr>
