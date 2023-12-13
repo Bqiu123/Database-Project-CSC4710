@@ -7,6 +7,9 @@ public class Tree
 	protected String proximityToHouse;
 	protected String clientID;
 	protected String quoteID;
+	protected String totalTreesCut;
+	protected String totalAmountPaid;
+	protected String totalBalance;
 	
 	//Constructors
 	public Tree() {}
@@ -14,6 +17,14 @@ public class Tree
 	public Tree(String treeID)
 	{
 		this.treeID = treeID;
+	}
+	
+	public Tree(String clientID, String totalTreesCut, String totalAmountPaid, String totalBalance)
+	{
+		this.clientID = clientID;
+		this.totalTreesCut = totalTreesCut;
+		this.totalAmountPaid = totalAmountPaid;
+		this.totalBalance = totalBalance;
 	}
 	
 	public Tree(String treeID, String size, String height, String location, String proximityToHouse, String clientID, String quoteID)
@@ -101,5 +112,35 @@ public class Tree
 	public void setQuoteID(String quoteID)
 	{
 		this.quoteID = quoteID;
+	}
+	
+	public String getTotalTreesCut()
+	{
+		return totalTreesCut;
+	}
+	
+	public void setTotalTreesCut(String totalTreesCut)
+	{
+		this.totalTreesCut = totalTreesCut;
+	}
+	
+	public String getTotalAmountPaid()
+	{
+		return totalAmountPaid;
+	}
+	
+	public void setTotalAmountPaid(String totalAmountPaid)
+	{
+		this.totalAmountPaid = totalAmountPaid;
+	}
+	
+	public String getTotalBalance()
+	{
+		return totalBalance;
+	}
+	
+	public void setTotalBalance(String totalBalance)
+	{
+		this.totalBalance = totalBalance;
 	}
 }

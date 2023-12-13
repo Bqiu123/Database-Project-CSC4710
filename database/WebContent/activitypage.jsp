@@ -63,23 +63,34 @@
         <tr>
             <th>Quote ID</th>
             <th>Initial Price</th>
-            <th>Time Window</th>
+            <th>Schedule Start</th>
+            <th>Schedule End</th>
             <th>Status</th>
         </tr>
         <c:forEach var="quote" items="${sessionScope.userQuotes}">
             <tr>
                 <td><c:out value="${quote.quoteID}" /></td>
                 <td><c:out value="${quote.initialPrice}" /></td>
-                <td><c:out value="${quote.timeWindow}" /></td>
+                <td><c:out value="${quote.scheduleStart}" /></td>
+                <td><c:out value="${quote.scheduleEnd}" /></td>
                 <td><c:out value="${quote.status}" /></td>
                 <td>
-            <form action="RespondQuote.jsp">
-                <input type="hidden" name="quoteID" value="${quote.quoteID}" />
-                <input type="submit" value="Respond Quote" />
-            </form>
+            <c:if test="${quote.status != 'Confirmed'}">
+                <form action="RespondQuote.jsp" style="display:inline;">
+                    <input type="hidden" name="quoteID" value="${quote.quoteID}" />
+                    <input type="submit" value="Respond Quote" />
+                </form>
+                <form action="agreeToQuote"  style="display:inline;">
+                    <input type="hidden" name="quoteID" value="${quote.quoteID}" />
+                    <input type="hidden" name="initialPrice" value="${quote.initialPrice}" />
+                    <input type="hidden" name="scheduleStart" value="${quote.scheduleStart}" />
+                    <input type="hidden" name="scheduleEnd" value="${quote.scheduleEnd}" />
+                    <input type="submit" value="Agree" />
+                </form>
+            </c:if>
         </td>
-            </tr>
-        </c:forEach>
+    </tr>
+</c:forEach>
     </table>
 <a href="login.jsp" target="_self">Return to Login Page</a>
 		

@@ -109,6 +109,9 @@ public class ControlServlet extends HttpServlet {
         		System.out.println("The action is: listBillMessages");
         		listBillMessages(request, response);
         		break;
+        	case "/agreeToQuote":
+                agreeToQuote(request, response);
+                break;
 	    	}
 	    }
 	    catch(Exception ex) {
@@ -210,7 +213,12 @@ public class ControlServlet extends HttpServlet {
 			request.setAttribute("listOrders", userDAO.listAllOrders());
 			request.setAttribute("listBills", userDAO.listAllBills());
 			request.setAttribute("listBillMessages", userDAO.listAllBillMessages());
-	    	request.getRequestDispatcher("rootView.jsp").forward(request, response);
+			request.setAttribute("listHighestTree", userDAO.listHighestTree());
+			request.setAttribute("listMostTrees", userDAO.listMostTrees());
+			request.setAttribute("listOneTreeQuote", userDAO.listOneTreeQuote());
+			request.setAttribute("listProspectiveClients", userDAO.listProspectiveClients());	
+			request.setAttribute("Statistics", userDAO.Statistics());
+			request.getRequestDispatcher("rootView.jsp").forward(request, response);
 	    }
 	    
 	    private void davidSmithDashBoard(HttpServletRequest request, HttpServletResponse response, String view) throws ServletException, IOException, SQLException{
@@ -334,7 +342,8 @@ public class ControlServlet extends HttpServlet {
 	    
 	    private void initialQuote(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
 	    	String initialPrice = request.getParameter("initialPrice");
-	    	String timeWindow = request.getParameter("timeWindow");
+	    	String scheduleStart = request.getParameter("scheduleStart");
+	    	String scheduleEnd = request.getParameter("scheduleEnd");
 	    	String treeID = request.getParameter("treeID");
 	    	if (treeID == null || treeID.isEmpty()) {
 	    	    // Handle missing treeID
@@ -358,15 +367,16 @@ public class ControlServlet extends HttpServlet {
 	        }
 	        
 	        if (initialPrice == null || initialPrice.isEmpty() ||
-	        		timeWindow == null || timeWindow.isEmpty() || 
-	        		        clientID == null || clientID.isEmpty()) {
+	        		scheduleStart == null || scheduleStart.isEmpty() ||
+	        				scheduleEnd == null || scheduleEnd.isEmpty() ||
+	        		        	clientID == null || clientID.isEmpty()) {
 
 		            // Set error message in request and forward to the form page
 		            request.setAttribute("errorMessage", "All fields are required.");
 		            request.getRequestDispatcher("processQuote.jsp").forward(request, response);
 		        } else {
 		            // Proceed with normal flow if all fields are filled
-		            Quote quote = new Quote(initialPrice, timeWindow, status, clientID, contractorID);
+		            Quote quote = new Quote(initialPrice, scheduleStart, scheduleEnd, status, clientID, contractorID);
 		            userDAO.insertQuote(quote, treeID);
 		            
 		            request.getSession().setAttribute("successMessage", "Request Submitted Successfully. Please wait for a response.");
@@ -410,6 +420,9 @@ public class ControlServlet extends HttpServlet {
 	        String quoteID = request.getParameter("quoteID");
 	        String responseAction = request.getParameter("response");
 	        String userID = (String) request.getSession().getAttribute("userID");
+	    
+	        
+	        userDAO dao = new userDAO();
 
 	        try {
 	            if (quoteID == null || quoteID.isEmpty() || responseAction == null || responseAction.isEmpty()) {
@@ -419,10 +432,7 @@ public class ControlServlet extends HttpServlet {
 	                return;
 	            }
 
-	            if ("agree".equals(responseAction)) {
-	                Bills bill = new Bills("orderID", "price", "0", "balance", "Unpaid");
-	                userDAO.insertBill(bill);
-	            } else if ("decline".equals(responseAction)) {
+	            if ("decline".equals(responseAction)) {
 	                userDAO.deleteQuote(quoteID);
 	            } else if ("negotiate".equals(responseAction)) {
 	                String note = request.getParameter("note");
@@ -436,8 +446,12 @@ public class ControlServlet extends HttpServlet {
 	                userDAO.insertQuoteMessage(quoteMessage);
 	            }
 
-	            request.getSession().setAttribute("successMessage", "Response to quote processed successfully.");
-	            response.sendRedirect("RespondQuote.jsp");
+	            HttpSession session = request.getSession();
+	            String clientID = (String) session.getAttribute("userID");
+	            List<Quote> updatedQuotes = dao.getQuotesByClientID(clientID);
+
+	            session.setAttribute("userQuotes", updatedQuotes);
+	            response.sendRedirect("activitypage.jsp"); 
 	        } catch (SQLException e) {
 	            request.setAttribute("errorMessage", "Database access error: " + e.getMessage());
 	            request.getRequestDispatcher("RespondQuote.jsp").forward(request, response);
@@ -447,16 +461,38 @@ public class ControlServlet extends HttpServlet {
 	    private void updateQuoteDetails(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	        String quoteID = request.getParameter("quoteID");
 	        String newPrice = request.getParameter("price");
-	        String newTimeWindow = request.getParameter("timeWindow");
+	        String newScheduleStart = request.getParameter("scheduleStart");
+	        String newScheduleEnd = request.getParameter("scheduleEnd");
 
 	        try {
-	            userDAO.updateQuoteDetails(quoteID, newPrice, newTimeWindow);
+	            userDAO.updateQuoteDetails(quoteID, newPrice, newScheduleStart, newScheduleEnd);
 	            request.setAttribute("message", "Quote updated successfully");
 	            RequestDispatcher dispatcher = request.getRequestDispatcher("davidSmithDashboard.jsp");
 	            davidSmithDashBoard(request, response, "");
 	            dispatcher.forward(request, response);
 	        } catch (SQLException e) {
 	            throw new ServletException("Database access error: " + e.getMessage(), e);
+	        }
+	    }
+	    
+	    private void agreeToQuote(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	        String quoteID = request.getParameter("quoteID");
+	        String price = request.getParameter("initialPrice");
+	        String scheduleStart = request.getParameter("scheduleStart");
+	        String scheduleEnd = request.getParameter("scheduleEnd");
+
+	        userDAO dao = new userDAO();
+	        try {
+	            dao.agreeToQuote(quoteID, price, scheduleStart, scheduleEnd);
+
+	            HttpSession session = request.getSession();
+	            String clientID = (String) session.getAttribute("userID");
+	            List<Quote> updatedQuotes = dao.getQuotesByClientID(clientID);
+
+	            session.setAttribute("userQuotes", updatedQuotes);
+	            response.sendRedirect("activitypage.jsp"); 
+	        } catch (SQLException e) {
+	            throw new ServletException("Database error: " + e.getMessage());
 	        }
 	    }
 	    

@@ -13,6 +13,7 @@ public class user
 	    protected String adress_city;
 	    protected String adress_state;
 	    protected String adress_zip_code;
+	    protected String treesCut;
 
 
 	    //constructors
@@ -22,6 +23,14 @@ public class user
 	    public user(String email) 
 	    {
 	        this.email = email;
+	    }
+	    
+	    public user(String id, String firstName, String lastName, String treesCut) 
+	    {
+	        this.id = id;
+	        this.firstName = firstName;
+	        this.lastName = lastName;
+	        this.treesCut = treesCut;
 	    }
 	    
 	    public user(String id, String email,String firstName, String lastName, String password,String creditCardNumber,String phoneNumber, String role, String adress_street_num, String adress_street, String adress_city, String adress_state,String adress_zip_code) 
@@ -48,8 +57,7 @@ public class user
 
 	    }
 	    
-	   //getter and setter methods 
-	    
+	   //getter and setter methods
 	    public String getId() {
 	        return id;
 	    }
@@ -134,6 +142,12 @@ public class user
 	        this.adress_zip_code = adress_zip_code;
 	    }
 	    
+	    public String getTreesCut() {
+	        return treesCut;
+	    }
+	    public void setTreesCut(String treesCut) {
+	        this.treesCut = treesCut;
+	    }
 	    
 	    
 	}
