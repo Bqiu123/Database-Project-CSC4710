@@ -204,32 +204,6 @@
     </div>
 	</div>
 	
-	 <div align="center">
-        <table border="1" cellpadding="6">
-            <caption><h2>Highest Tree(s)</h2></caption>
-            <tr>
-            	<th>Tree ID</th>
-                <th>Size</th>
-                <th>Height</th>
-                <th>Location</th>
-                <th>Proximity To House</th>
-                <th>Client ID</th>
-                <th>Quote ID</th>
-            </tr> 
-            <c:forEach var="tree" items="${listHighestTree}">
-                <tr style="text-align:center">
-                	<td><c:out value="${tree.treeID}" /></td>
-                    <td><c:out value="${tree.size}" /></td>
-                    <td><c:out value="${tree.height}" /></td>
-                    <td><c:out value="${tree.location}" /></td>
-                    <td><c:out value="${tree.proximityToHouse}" /></td>
-			        <td><c:out value="${tree.clientID}" /></td>
-			        <td><c:out value="${tree.quoteID}" /></td>
-
-            </c:forEach>
-        </table>
-	</div>
-	
 	<div align="center">
         <table border="1" cellpadding="6">
             <caption><h2>Big Clients</h2></caption>
@@ -245,6 +219,28 @@
                     <td><c:out value="${users.firstName}" /></td>
                     <td><c:out value="${users.lastName}" /></td>
                     <td><c:out value="${users.treesCut}" /></td>
+
+            </c:forEach>
+        </table>
+	</div>
+	
+	<div align="center">
+        <table border="1" cellpadding="6">
+            <caption><h2>Easy Clients</h2></caption>
+            <tr>
+            	<th>Quote ID</th>
+                <th>Initial Price</th>
+                <th>Schedule Start</th>
+                <th>Schedule End</th>
+                <th>Client ID</th>
+            </tr> 
+            <c:forEach var="quote" items="${listEasyClients}">
+                <tr style="text-align:center">
+                	<td><c:out value="${quote.quoteID}" /></td>
+                    <td><c:out value="${quote.initialPrice}" /></td>
+                    <td><c:out value="${quote.scheduleStart}" /></td>
+                    <td><c:out value="${quote.scheduleEnd}" /></td>
+                     <td><c:out value="${quote.clientID}" /></td>
 
             </c:forEach>
         </table>
@@ -291,6 +287,55 @@
                     <td><c:out value="${quote.scheduleStart}" /></td>
                     <td><c:out value="${quote.scheduleEnd}" /></td>
                      <td><c:out value="${quote.clientID}" /></td>
+
+            </c:forEach>
+        </table>
+	</div>
+	
+	 <div align="center">
+        <table border="1" cellpadding="6">
+            <caption><h2>Highest Tree(s)</h2></caption>
+            <tr>
+            	<th>Tree ID</th>
+                <th>Size</th>
+                <th>Height</th>
+                <th>Location</th>
+                <th>Proximity To House</th>
+                <th>Client ID</th>
+                <th>Quote ID</th>
+            </tr> 
+            <c:forEach var="tree" items="${listHighestTree}">
+                <tr style="text-align:center">
+                	<td><c:out value="${tree.treeID}" /></td>
+                    <td><c:out value="${tree.size}" /></td>
+                    <td><c:out value="${tree.height}" /></td>
+                    <td><c:out value="${tree.location}" /></td>
+                    <td><c:out value="${tree.proximityToHouse}" /></td>
+			        <td><c:out value="${tree.clientID}" /></td>
+			        <td><c:out value="${tree.quoteID}" /></td>
+
+            </c:forEach>
+        </table>
+	</div>
+	
+	
+	<div align="center">
+        <table border="1" cellpadding="6">
+            <caption><h2>Overdue Bills</h2></caption>
+            <tr>
+            	<th>Bill ID</th>
+                <th>Order ID</th>
+                <th>Price</th>
+                <th>Discount</th>
+                <th>Balance</th>
+            </tr> 
+            <c:forEach var="bills" items="${listOverdueBills}">
+                <tr style="text-align:center">
+                	<td><c:out value="${bills.billID}" /></td>
+                    <td><c:out value="${bills.orderID}" /></td>
+                    <td><c:out value="${bills.price}" /></td>
+                    <td><c:out value="${bills.discount}" /></td>
+                    <td><c:out value="${bills.balance}" /></td>
 
             </c:forEach>
         </table>

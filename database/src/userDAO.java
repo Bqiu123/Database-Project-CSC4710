@@ -1283,9 +1283,32 @@ public class userDAO
                 updateQuoteStmt.setString(1, quoteID);
                 updateQuoteStmt.executeUpdate();
             }
+            
+           
+            
         } finally {
             disconnect();
         }
+    }
+    
+    public void createBill(String orderID, String price) throws SQLException
+    {
+    	try
+    	{
+    		connect_func();
+    		 String createBillSql = "INSERT INTO Bills(orderID, price, discount, balance, status) VALUES (?,?,?,?,?)";
+             try (PreparedStatement createBillStmt = connect.prepareStatement(createBillSql)) {
+             	createBillStmt.setString(1, orderID);
+             	createBillStmt.setString(2, price);
+             	createBillStmt.setString(3, "0");
+             	createBillStmt.setString(4, price);
+             	createBillStmt.setString(5, "Unpaid");
+             	createBillStmt.executeUpdate();
+             }
+    		connect_func();
+    	} finally {
+    		disconnect();
+    	}
     }
     
     public List<Tree> listHighestTree() throws SQLException{
@@ -1357,6 +1380,30 @@ public class userDAO
         return listQuote;
     }
     
+    public List<Quote> listEasyClients() throws SQLException {
+        List<Quote> listQuote = new ArrayList<Quote>();
+        String sql = "SELECT q.*\n"
+        		+ "FROM Quote q\n"
+        		+ "LEFT JOIN QuoteMessages qm ON q.quoteID = qm.quoteID\n"
+        		+ "WHERE qm.quoteID IS NULL";
+        connect_func();
+        try (Statement statement = connect.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                Quote quote = new Quote();
+                quote.setQuoteID(resultSet.getString("quoteID"));
+                quote.setInitialPrice(resultSet.getString("initialPrice"));
+                quote.setScheduleStart(resultSet.getString("scheduleStart"));
+                quote.setScheduleEnd(resultSet.getString("scheduleEnd"));
+                quote.setClientID(resultSet.getString("clientID"));
+                listQuote.add(quote);
+            }
+        } finally {
+            disconnect();
+        }
+        return listQuote;
+    }
+    
     public List<Quote> listProspectiveClients() throws SQLException {
         List<Quote> listQuote = new ArrayList<Quote>();
         String sql = "SELECT * FROM Quote WHERE quoteID NOT IN (SELECT quoteID FROM Orders)";
@@ -1376,6 +1423,30 @@ public class userDAO
             disconnect();
         }
         return listQuote;
+    }
+    
+    public List<Bills> overdueBills() throws SQLException {
+    	List<Bills> listOverdueBills = new ArrayList<Bills>();
+    	String sql = "SELECT b.* FROM Bills b JOIN Orders o ON b.orderID = o.orderID WHERE b.status != 'Paid' AND DATEDIFF(o.scheduleEnd, o.scheduleStart) > 7";
+    	connect_func();
+    	
+    	
+    	
+    	try (Statement statement = connect.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+             		while (resultSet.next()) {
+                			Bills bill = new Bills();
+                			bill.setBillID(resultSet.getString("billID"));
+                			bill.setOrderID(resultSet.getString("orderID"));
+                			bill.setPrice(resultSet.getString("price"));
+                			bill.setDiscount(resultSet.getString("discount"));
+                			bill.setBalance(resultSet.getString("balance"));
+                			listOverdueBills.add(bill);
+                		}
+    	} finally {
+    		disconnect();
+    	}
+    	return listOverdueBills;
     }
     
     public List<Tree> Statistics() throws SQLException {
@@ -1498,87 +1569,86 @@ public class userDAO
 					          
         					};
         String[] TUPLES = {("insert into User(id, email, firstName, lastName, password, creditCardNumber, phoneNumber, role, adress_street_num, adress_street, adress_city, adress_state, adress_zip_code)"+
-        			"values (id,'root', 'default', 'default','pass1234', '1234-3456-4567-5678','123-234-4567', 'root', '0000', 'Default', 'Default', '0', '00000'),"+
-        					"(id,'davidsmith@gmail.com', 'David', 'Smith','david1234', '0000-0000-0000-0000','000-000-0000', 'David Smith', '0000', 'Default', 'Default', '0', '00000')," +
-			    		 	"(id,'don@gmail.com', 'Don', 'Cummings','don1234', '4972-9215-7861-2529','453-921-1233', 'Client', '1000', 'hi street', 'mama', 'MO', '12345'),"+
-			    	 	 	"(id,'margarita@gmail.com', 'Margarita', 'Lawson','margarita1234', '0551-1797-8053-2646','281-966-2201', 'Client', '1234', 'ivan street', 'tata','CO','12561'),"+
-			    		 	"(id,'jo@gmail.com', 'Jo', 'Brady','jo1234', '1558-7516-4276-7312','121-717-1085', 'Client', '3214','marko street', 'brat', 'DU', '54321'),"+
-			    		 	"(id,'wallace@gmail.com', 'Wallace', 'Moore','wallace1234', '7798-1489-2513-1024','859-738-0661', 'Client', '4500', 'frey street', 'sestra', 'MI', '48202'),"+
-			    		 	"(id,'amelia@gmail.com', 'Amelia', 'Phillips','amelia1234', '3939-6766-6025-7909','157-417-5433', 'Client', '1245', 'm8s street', 'baka', 'IL', '48000'),"+
-			    			"(id,'sophie@gmail.com', 'Sophie', 'Pierce','sophie1234', '2821-0436-9879-0137','814-722-1464', 'Client', '2468', 'yolos street', 'ides', 'CM', '24680'),"+
-			    			"(id,'angelo@gmail.com', 'Angelo', 'Francis','angelo1234', '8275-0022-7017-0368','767-805-6058', 'Client', '4680', 'egypt street', 'lolas', 'DT', '13579'),"+
-			    			"(id,'rudy@gmail.com', 'Rudy', 'Smith','rudy1234', '0860-6191-8026-5295','408-200-2252', 'Client', '1234', 'sign street', 'samo ne tu','MH', '09876'),"+
-			    			"(id,'jeannette@gmail.com', 'Jeannette ', 'Stone','jeannette1234', '7738-9880-5284-3227','606-059-0950', 'Client', '0981', 'snoop street', 'kojik', 'HW', '87654'),"+
-			    			"(id, 'susie@gmail.com', 'Susie ', 'Guzman', 'susie1234', '2038-7418-0996-1404','215-638-3029', 'Client', '1234', 'whatever street', 'detroit', 'MI', '48202');"),
-			        		("INSERT INTO Quote (initialPrice, scheduleStart, scheduleEnd, status, clientID, contractorID) VALUES" +
-			    		 	"(200.50, '2023-11-15', '2023-11-16', 'Pending', 1, 1),"+
-			    		 	"(150.75, '2023-11-20', '2023-11-21', 'Confirmed', 2, 1),"+
-			    		 	"(300.00, '2023-11-25', '2023-11-26', 'Pending', 3, 1),"+
-			    		 	"(175.25, '2023-12-01', '2023-12-02', 'Confirmed', 4, 1),"+
-			    		 	"(220.40, '2023-12-05', '2023-12-06', 'Pending', 5, 1),"+
-			    		 	"(180.90, '2023-12-10', '2023-12-11', 'Confirmed', 6, 1),"+
-			    		 	"(250.30, '2023-12-15', '2023-12-16', 'Pending', 7, 1),"+
-			    		 	"(160.00, '2023-12-20', '2023-12-21', 'Confirmed', 8, 1),"+
-			    		 	"(190.85, '2023-12-25', '2023-12-26', 'Pending', 9, 1),"+
-			    		 	"(210.60, '2023-12-30', '2023-12-31', 'Confirmed', 10, 1);"),
-        		 			("INSERT INTO Tree (size, height, location, proximityToHouse, clientID, quoteID) VALUES" +
-        				    "(5.5, 20, '123 Oak Street', 10, 1, 1)," +
-        				    "(3.2, 15, '456 Pine Lane', 15, 2, 2)," +
-        				    "(6.7, 25, '789 Maple Ave', 5, 3, 3)," +
-        				    "(4.5, 18, '321 Birch Road', 8, 4, NULL)," +
-        				    "(2.8, 10, '654 Cedar Blvd', 12, 5, NULL)," +
-        				    "(5.0, 22, '987 Elm Street', 7, 6, NULL)," +
-        				    "(3.6, 16, '123 Spruce Lane', 11, 7, NULL)," +
-        				    "(4.8, 20, '456 Fir Avenue', 9, 8, NULL)," +
-        				    "(7.1, 28, '789 Redwood Drive', 4, 9, NULL)," +
-        				    "(3.0, 14, '321 Willow Way', 13, 10, NULL);"),
-        		 			("INSERT INTO QuoteMessages (userID, quoteID, msgTime, note) VALUES" +
-        		 			"(1, 1, '2023-11-12 10:00:00', 'First message note')," +
-        		 			"(2, 2, '2023-11-13 11:00:00', 'Second message note')," +
-        		 			"(3, 3, '2023-11-14 12:00:00', 'Third message note')," +
-        		 			"(4, 4, '2023-11-15 13:00:00', 'Fourth message note')," +
-        		 			"(5, 5, '2023-11-16 14:00:00', 'Fifth message note')," +
-        		 			"(6, 6, '2023-11-17 15:00:00', 'Sixth message note')," +
-        		 			"(7, 7, '2023-11-18 16:00:00', 'Seventh message note')," +
-        		 			"(8, 8, '2023-11-19 17:00:00', 'Eighth message note')," +
-        		 			"(9, 9, '2023-11-20 18:00:00', 'Ninth message note')," +
-        		 			"(10, 10, '2023-11-21 19:00:00', 'Tenth message note');"),        		 			
-        		 			("INSERT INTO Orders (quoteID, price, scheduleStart, scheduleEnd) VALUES" +
-        		 			"(1, 200.50, '2023-11-15', '2023-11-16')," +
-        		 			"(2, 150.75, '2023-11-20', '2023-11-21')," +
-        		 			"(3, 300.00, '2023-11-25', '2023-11-26')," +
-        		 			"(4, 175.25, '2023-12-01', '2023-12-02')," +
-        		 			"(5, 220.40, '2023-12-05', '2023-12-06')," +
-        		 			"(6, 180.90, '2023-12-10', '2023-12-11')," +
-        		 			"(7, 250.30, '2023-12-15', '2023-12-16')," +
-        		 			"(8, 160.00, '2023-12-20', '2023-12-21')," +
-        		 			"(9, 190.85, '2023-12-25', '2023-12-26')," +
-        		 			"(10, 210.60, '2023-12-30', '2023-12-31');"),       		 			
-        		 			("INSERT INTO Bills (orderID, price, discount, balance, status) VALUES" +
-        		 			"(1, 200.50, 10.00, 190.50, 'Unpaid')," +
-        		 			"(2, 150.75, 5.00, 145.75, 'Unpaid')," +
-        		 			"(3, 300.00, 15.00, 285.00, 'Unpaid')," +
-        		 			"(4, 175.25, 8.50, 166.75, 'Paid')," +
-        		 			"(5, 220.40, 11.00, 209.40, 'Unpaid')," +
-        		 			"(6, 180.90, 9.00, 171.90, 'Paid')," +
-        		 			"(7, 250.30, 12.50, 237.80, 'Unpaid')," +
-        		 			"(8, 160.00, 8.00, 152.00, 'Unpaid')," +
-        		 			"(9, 190.85, 9.50, 181.35, 'Paid')," +
-        		 			"(10, 210.60, 10.50, 200.10, 'Unpaid');"),        		 			
-        		 			("INSERT INTO BillMessages (userID, billID, msgTime, price, note) VALUES" +
-        		 			"(1, 1, '2023-11-12 10:30:00', 200.50, 'First bill message')," +
-        		 			"(2, 2, '2023-11-13 11:30:00', 150.75, 'Second bill message')," +
-        		 			"(3, 3, '2023-11-14 12:30:00', 300.00, 'Third bill message')," +
-        		 			"(4, 4, '2023-11-15 13:30:00', 175.25, 'Fourth bill message')," +
-        		 			"(5, 5, '2023-11-16 14:30:00', 220.40, 'Fifth bill message')," +
-        		 			"(6, 6, '2023-11-17 15:30:00', 180.90, 'Sixth bill message')," +
-        		 			"(7, 7, '2023-11-18 16:30:00', 250.30, 'Seventh bill message')," +
-        		 			"(8, 8, '2023-11-19 17:30:00', 160.00, 'Eighth bill message')," +
-        		 			"(9, 9, '2023-11-20 18:30:00', 190.85, 'Ninth bill message')," +
-        		 			"(10, 10, '2023-11-21 19:30:00', 210.60, 'Tenth bill message');"),
+    			"values (id,'root', 'default', 'default','pass1234', '1234-3456-4567-5678','123-234-4567', 'root', '0000', 'Default', 'Default', '0', '00000'),"+
+    					"(id,'davidsmith@gmail.com', 'David', 'Smith','david1234', '0000-0000-0000-0000','000-000-0000', 'David Smith', '0000', 'Default', 'Default', '0', '00000')," +
+		    		 	"(id,'don@gmail.com', 'Don', 'Cummings','don1234', '4972-9215-7861-2529','453-921-1233', 'Client', '1000', 'hi street', 'mama', 'MO', '12345'),"+
+		    	 	 	"(id,'margarita@gmail.com', 'Margarita', 'Lawson','margarita1234', '0551-1797-8053-2646','281-966-2201', 'Client', '1234', 'ivan street', 'tata','CO','12561'),"+
+		    		 	"(id,'jo@gmail.com', 'Jo', 'Brady','jo1234', '1558-7516-4276-7312','121-717-1085', 'Client', '3214','marko street', 'brat', 'DU', '54321'),"+
+		    		 	"(id,'wallace@gmail.com', 'Wallace', 'Moore','wallace1234', '7798-1489-2513-1024','859-738-0661', 'Client', '4500', 'frey street', 'sestra', 'MI', '48202'),"+
+		    		 	"(id,'amelia@gmail.com', 'Amelia', 'Phillips','amelia1234', '3939-6766-6025-7909','157-417-5433', 'Client', '1245', 'm8s street', 'baka', 'IL', '48000'),"+
+		    			"(id,'sophie@gmail.com', 'Sophie', 'Pierce','sophie1234', '2821-0436-9879-0137','814-722-1464', 'Client', '2468', 'yolos street', 'ides', 'CM', '24680'),"+
+		    			"(id,'angelo@gmail.com', 'Angelo', 'Francis','angelo1234', '8275-0022-7017-0368','767-805-6058', 'Client', '4680', 'egypt street', 'lolas', 'DT', '13579'),"+
+		    			"(id,'rudy@gmail.com', 'Rudy', 'Smith','rudy1234', '0860-6191-8026-5295','408-200-2252', 'Client', '1234', 'sign street', 'samo ne tu','MH', '09876'),"+
+		    			"(id,'jeannette@gmail.com', 'Jeannette ', 'Stone','jeannette1234', '7738-9880-5284-3227','606-059-0950', 'Client', '0981', 'snoop street', 'kojik', 'HW', '87654'),"+
+		    			"(id, 'susie@gmail.com', 'Susie ', 'Guzman', 'susie1234', '2038-7418-0996-1404','215-638-3029', 'Client', '1234', 'whatever street', 'detroit', 'MI', '48202');"),
+		        		("INSERT INTO Quote (initialPrice, scheduleStart, scheduleEnd, status, clientID, contractorID) VALUES" +
+		    		 	"(200.50, '2023-11-15', '2023-11-16', 'Pending', 1, 1),"+
+		    		 	"(150.75, '2023-11-20', '2023-11-21', 'Confirmed', 2, 1),"+
+		    		 	"(300.00, '2023-11-25', '2023-11-26', 'Pending', 3, 1),"+
+		    		 	"(175.25, '2023-12-01', '2023-12-02', 'Confirmed', 4, 1),"+
+		    		 	"(220.40, '2023-12-05', '2023-12-06', 'Pending', 5, 1),"+
+		    		 	"(180.90, '2023-12-10', '2023-12-11', 'Confirmed', 6, 1),"+
+		    		 	"(250.30, '2023-12-15', '2023-12-16', 'Pending', 7, 1),"+
+		    		 	"(160.00, '2023-12-20', '2023-12-21', 'Confirmed', 8, 1),"+
+		    		 	"(190.85, '2023-12-25', '2023-12-26', 'Pending', 9, 1),"+
+		    		 	"(210.60, '2023-12-30', '2023-12-31', 'Confirmed', 10, 1);"),
+    		 			("INSERT INTO Tree (size, height, location, proximityToHouse, clientID, quoteID) VALUES" +
+    				    "(5.5, 20, '123 Oak Street', 10, 1, 1)," +
+    				    "(3.2, 15, '456 Pine Lane', 15, 2, 2)," +
+    				    "(6.7, 25, '789 Maple Ave', 5, 3, 3)," +
+    				    "(4.5, 28, '321 Birch Road', 8, 4, NULL)," +
+    				    "(2.8, 10, '654 Cedar Blvd', 12, 5, NULL)," +
+    				    "(5.0, 22, '987 Elm Street', 7, 6, NULL)," +
+    				    "(3.6, 16, '123 Spruce Lane', 11, 7, NULL)," +
+    				    "(4.8, 20, '456 Fir Avenue', 9, 8, NULL)," +
+    				    "(7.1, 28, '789 Redwood Drive', 4, 9, NULL)," +
+    				    "(3.0, 14, '321 Willow Way', 13, 10, NULL);"),
+    		 			("INSERT INTO QuoteMessages (userID, quoteID, msgTime, note) VALUES" +
+    		 			"(1, 1, '2023-11-12 10:00:00', 'First message note')," +
+    		 			"(2, 2, '2023-11-13 11:00:00', 'Second message note')," +
+    		 			"(3, 3, '2023-11-14 12:00:00', 'Third message note')," +
+    		 			"(4, 4, '2023-11-15 13:00:00', 'Fourth message note')," +
+    		 			"(5, 5, '2023-11-16 14:00:00', 'Fifth message note')," +
+    		 			"(6, 6, '2023-11-17 15:00:00', 'Sixth message note')," +
+    		 			"(7, 7, '2023-11-18 16:00:00', 'Seventh message note')," +
+    		 			"(8, 8, '2023-11-19 17:00:00', 'Eighth message note')," +
+    		 			"(9, 9, '2023-11-20 18:00:00', 'Ninth message note')," +
+    		 			"(10, 10, '2023-11-21 19:00:00', 'Tenth message note');"),        		 			
+    		 			("INSERT INTO Orders (quoteID, price, scheduleStart, scheduleEnd) VALUES" +
+    		 			"(1, 200.50, '2023-11-15', '2023-11-16')," +
+    		 			"(2, 150.75, '2023-11-20', '2023-11-21')," +
+    		 			"(3, 300.00, '2023-11-25', '2023-11-26')," +
+    		 			"(4, 175.25, '2023-12-01', '2023-12-02')," +
+    		 			"(5, 220.40, '2023-12-05', '2023-12-06')," +
+    		 			"(6, 180.90, '2023-12-10', '2023-12-11')," +
+    		 			"(7, 250.30, '2023-12-15', '2023-12-16')," +
+    		 			"(8, 160.00, '2023-12-20', '2023-12-21')," +
+    		 			"(9, 190.85, '2023-12-25', '2023-12-26')," +
+    		 			"(10, 210.60, '2023-12-30', '2023-12-31');"),       		 			
+    		 			("INSERT INTO Bills (orderID, price, discount, balance, status) VALUES" +
+    		 			"(1, 200.50, 10.00, 190.50, 'Unpaid')," +
+    		 			"(2, 150.75, 5.00, 145.75, 'Unpaid')," +
+    		 			"(3, 300.00, 15.00, 285.00, 'Unpaid')," +
+    		 			"(4, 175.25, 8.50, 166.75, 'Paid')," +
+    		 			"(5, 220.40, 11.00, 209.40, 'Unpaid')," +
+    		 			"(6, 180.90, 9.00, 171.90, 'Paid')," +
+    		 			"(7, 250.30, 12.50, 237.80, 'Unpaid')," +
+    		 			"(8, 160.00, 8.00, 152.00, 'Unpaid')," +
+    		 			"(9, 190.85, 9.50, 181.35, 'Paid')," +
+    		 			"(10, 210.60, 10.50, 200.10, 'Unpaid');"),        		 			
+    		 			("INSERT INTO BillMessages (userID, billID, msgTime, price, note) VALUES" +
+    		 			"(1, 1, '2023-11-12 10:30:00', 200.50, 'First bill message')," +
+    		 			"(2, 2, '2023-11-13 11:30:00', 150.75, 'Second bill message')," +
+    		 			"(3, 3, '2023-11-14 12:30:00', 300.00, 'Third bill message')," +
+    		 			"(4, 4, '2023-11-15 13:30:00', 175.25, 'Fourth bill message')," +
+    		 			"(5, 5, '2023-11-16 14:30:00', 220.40, 'Fifth bill message')," +
+    		 			"(6, 6, '2023-11-17 15:30:00', 180.90, 'Sixth bill message')," +
+    		 			"(7, 7, '2023-11-18 16:30:00', 250.30, 'Seventh bill message')," +
+    		 			"(8, 8, '2023-11-19 17:30:00', 160.00, 'Eighth bill message')," +
+    		 			"(9, 9, '2023-11-20 18:30:00', 190.85, 'Ninth bill message')," +
+    		 			"(10, 10, '2023-11-21 19:30:00', 210.60, 'Tenth bill message');"),
 
-			    			};
-        
+		    			};
         //for loop to put these in database
         for (int i = 0; i < INITIAL.length; i++)
         	statement.execute(INITIAL[i]);

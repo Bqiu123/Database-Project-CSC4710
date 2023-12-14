@@ -30,6 +30,7 @@ public class Bills
 		this.balance = balance;
 		this.status = status;
 	}
+
 	
 	 // Getters and Setters
     public String getBillID() 

@@ -112,6 +112,9 @@ public class ControlServlet extends HttpServlet {
         	case "/agreeToQuote":
                 agreeToQuote(request, response);
                 break;
+        	case "/createBill":
+        		createBill(request,response);
+        		break;
 	    	}
 	    }
 	    catch(Exception ex) {
@@ -217,7 +220,9 @@ public class ControlServlet extends HttpServlet {
 			request.setAttribute("listMostTrees", userDAO.listMostTrees());
 			request.setAttribute("listOneTreeQuote", userDAO.listOneTreeQuote());
 			request.setAttribute("listProspectiveClients", userDAO.listProspectiveClients());	
+			request.setAttribute("listOverdueBills", userDAO.overdueBills());
 			request.setAttribute("Statistics", userDAO.Statistics());
+			request.setAttribute("listEasyClients", userDAO.listEasyClients());		
 			request.getRequestDispatcher("rootView.jsp").forward(request, response);
 	    }
 	    
@@ -226,6 +231,7 @@ public class ControlServlet extends HttpServlet {
 	        request.setAttribute("listTreeWithoutQuote", listTreeWithoutQuote);
 	        List<QuoteMessageWithPrice>listAllQuoteMessagesWithPrice = userDAO.listAllQuoteMessagesWithPrice();
 	        request.setAttribute("listAllQuoteMessagesWithPrice", listAllQuoteMessagesWithPrice);
+	        request.setAttribute("listOrders", userDAO.listAllOrders());
 	    	request.getRequestDispatcher("davidSmithDashboard.jsp").forward(request, response);
 	    }
 	    
@@ -488,12 +494,33 @@ public class ControlServlet extends HttpServlet {
 	            HttpSession session = request.getSession();
 	            String clientID = (String) session.getAttribute("userID");
 	            List<Quote> updatedQuotes = dao.getQuotesByClientID(clientID);
+	            
+	            
 
 	            session.setAttribute("userQuotes", updatedQuotes);
 	            response.sendRedirect("activitypage.jsp"); 
 	        } catch (SQLException e) {
 	            throw new ServletException("Database error: " + e.getMessage());
 	        }
+	    }
+	    
+	    public void createBill(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	    {
+	    	String orderID = request.getParameter("orderID");
+	    	String price = request.getParameter("price");
+	    	String discount = request.getParameter("discount");
+	    	
+	    	userDAO dao = new userDAO();
+	    	
+	    	try {
+	    		dao.createBill(orderID, price);
+	    		
+	    		response.sendRedirect("davidSmithDashboard.jsp");
+	    		
+	    	} catch (SQLException e)
+	    	{
+	    		throw new ServletException("Database error: " + e.getMessage());
+	    	}
 	    }
 	    
 	    private void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {

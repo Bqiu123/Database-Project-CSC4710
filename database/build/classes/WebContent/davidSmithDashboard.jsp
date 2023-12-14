@@ -75,5 +75,34 @@
         </c:forEach>
     </table>
 	</div>
+	
+	<div align="center">
+        <table border="1" cellpadding="6">
+            <caption><h2>List of Orders</h2></caption>
+            <tr>
+                <th>Order ID</th>
+                <th>Quote ID</th>
+                <th>Price</th>
+                <th>Schedule Start</th>
+                <th>Schedule End</th>
+            </tr>
+            <c:forEach var="order" items="${listOrders}">
+                <tr style="text-align:center">
+                    <td><c:out value="${order.orderID}" /></td>
+                    <td><c:out value="${order.quoteID}" /></td>
+                    <td><c:out value="${order.price}" /></td>
+                    <td><c:out value="${order.scheduleStart}" /></td>
+                    <td><c:out value="${order.scheduleEnd}" /></td>
+                    <td>
+                    <form action="createBill"  style="display:inline;">
+                    <input type="hidden" name="orderID" value="${order.orderID}" />
+                    <input type="hidden" name="price" value="${order.price}" />
+                    <input type="submit" value="Create Bill" />
+                </form>
+                </td>
+                </tr>
+            </c:forEach>
+        </table>
+    </div>
 </body>
 </html>
