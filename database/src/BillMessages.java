@@ -1,6 +1,6 @@
 public class BillMessages {
     private String billMessageID; // Corresponds to billMessageID INT AUTO_INCREMENT PRIMARY KEY
-    private String userID;        // Corresponds to userID INTEGER
+    private String clientID;        // Corresponds to userID INTEGER
     private String billID;        // Corresponds to billID INTEGER
     private String msgTime;       // Corresponds to msgTime DATETIME
     private String price;         // Corresponds to price DOUBLE
@@ -14,17 +14,17 @@ public class BillMessages {
         this.billMessageID = billMessageID;
     }
 
-    public BillMessages(String billMessageID, String userID, String billID, String msgTime, String price, String note) {
+    public BillMessages(String billMessageID, String clientID, String billID, String msgTime, String price, String note) {
         this.billMessageID = billMessageID;
-        this.userID = userID;
+        this.clientID= clientID;
         this.billID = billID;
         this.msgTime = msgTime;
         this.price = price;
         this.note = note;
     }
 
-    public BillMessages(String userID, String billID, String msgTime, String price, String note) {
-        this.userID = userID;
+    public BillMessages(String clientID, String billID, String msgTime, String price, String note) {
+        this.clientID = clientID;
         this.billID = billID;
         this.msgTime = msgTime;
         this.price = price;
@@ -40,12 +40,12 @@ public class BillMessages {
         this.billMessageID = billMessageID;
     }
 
-    public String getUserID() {
-        return userID;
+    public String getClientID() {
+        return clientID;
     }
 
-    public void setUserID(String userID) {
-        this.userID = userID;
+    public void setClientID(String clientID) {
+        this.clientID = clientID;
     }
 
     public String getBillID() {

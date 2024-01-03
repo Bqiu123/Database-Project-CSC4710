@@ -2,9 +2,10 @@ public class Bills
 {
 	protected String billID;
 	protected String orderID;
+	protected String clientID;
 	protected String price;
-	protected String discount;
-	protected String balance;
+	protected String dateGenerated;
+	protected String datePaid;
 	protected String status;
 	
 	
@@ -16,18 +17,19 @@ public class Bills
 		this.billID = billID;
 	}
 	
-	public Bills(String billID, String orderID, String price, String discount, String balance, String status)
+	public Bills(String billID, String orderID, String clientID, String price, String dateGenerated, String datePaid, String status)
 	{
-		this(orderID, price, discount, balance, status);
+		this(orderID, clientID, price, dateGenerated, datePaid, status);
 		this.billID = billID;
 	}
 	
-	public Bills(String orderID, String price, String discount, String balance, String status)
+	public Bills(String orderID, String clientID, String price, String dateGenerated, String datePaid, String status)
 	{
 		this.orderID = orderID;
+		this.clientID = clientID;
 		this.price = price;
-		this.discount = discount;
-		this.balance = balance;
+		this.dateGenerated = dateGenerated;
+		this.datePaid = datePaid;
 		this.status = status;
 	}
 	
@@ -51,6 +53,16 @@ public class Bills
     {
         this.orderID = orderID;
     }
+    
+    public String getClientID()
+    {
+    	return clientID;
+    }
+    
+    public void setClientID(String clientID)
+    {
+    	this.clientID = clientID;
+    }
 
     public String getPrice() 
     {
@@ -62,24 +74,24 @@ public class Bills
         this.price = price;
     }
 
-    public String getDiscount() 
+    public String getDateGenerated() 
     {
-        return discount;
+        return dateGenerated;
     }
 
-    public void setDiscount(String discount) 
+    public void setDateGenerated(String dateGenerated) 
     {
-        this.discount = discount;
+        this.dateGenerated = dateGenerated;
     }
 
-    public String getBalance() 
+    public String getDatePaid() 
     {
-        return balance;
+        return datePaid;
     }
 
-    public void setBalance(String balance) 
+    public void setDatePaid(String datePaid) 
     {
-        this.balance = balance;
+        this.datePaid = datePaid;
     }
 
     public String getStatus() 

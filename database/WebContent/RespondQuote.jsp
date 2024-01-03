@@ -6,8 +6,9 @@
     <h2>Respond to Quote</h2>
     <form action="respondQuote" >
         <input type="hidden" name="quoteID" value="${param.quoteID}" />
-        <input type="radio" id="agree" name="response" value="agree">
-        <label for="agree">Agree</label><br>
+        <input type="hidden" name="price" value="${param.price}" />
+        <input type="hidden" name="scheduleStart" value="${param.scheduleStart}" />
+        <input type="hidden" name="scheduleEnd" value="${param.scheduleEnd}" />
         <input type="radio" id="decline" name="response" value="decline">
         <label for="decline">Decline</label><br>
         <input type="radio" id="negotiate" name="response" value="negotiate">

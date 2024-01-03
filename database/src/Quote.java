@@ -2,7 +2,8 @@ public class Quote
 {
 	protected String quoteID;
 	protected String initialPrice;
-	protected String timeWindow;
+	protected String scheduleStart;
+	protected String scheduleEnd;
 	protected String status;
 	protected String clientID;
 	protected String contractorID;
@@ -15,17 +16,18 @@ public class Quote
 		this.quoteID = quoteID;
 	}
 	
-	public Quote(String quoteID, String initialPrice, String timeWindow, String status, String clientID, String contractorID)
+	public Quote(String quoteID, String initialPrice, String scheduleStart,String scheduleEnd, String status, String clientID, String contractorID)
 	{
-		this(initialPrice, timeWindow, status, clientID, contractorID);
+		this(initialPrice, scheduleStart, scheduleEnd, status, clientID, contractorID);
 		this.quoteID = quoteID;
 		
 	}
 	
-	public Quote(String initialPrice, String timeWindow, String status, String clientID, String contractorID)
+	public Quote(String initialPrice, String scheduleStart,String scheduleEnd, String status, String clientID, String contractorID)
 	{
 		this.initialPrice = initialPrice;
-		this.timeWindow = timeWindow;
+		this.scheduleStart = scheduleStart;
+		this.scheduleEnd = scheduleEnd;
 		this.status = status;
 		this.clientID = clientID;
 		this.contractorID = contractorID;
@@ -51,14 +53,24 @@ public class Quote
 		this.initialPrice = initialPrice;
 	}
 	
-	public String getTimeWindow()
+	public String getScheduleStart()
 	{
-		return timeWindow;
+		return scheduleStart;
 	}
 	
-	public void setTimeWindow(String timeWindow)
+	public void setScheduleStart(String scheduleStart)
 	{
-		this.timeWindow = timeWindow;
+		this.scheduleStart = scheduleStart;
+	}
+	
+	public String getScheduleEnd()
+	{
+		return scheduleEnd;
+	}
+	
+	public void setScheduleEnd(String scheduleEnd)
+	{
+		this.scheduleEnd = scheduleEnd;
 	}
 	
 	public String getStatus()

@@ -61,9 +61,12 @@ public class ControlServlet extends HttpServlet {
         	case "/initialRequest":
         		initialRequest(request, response);
         		break;
-        	 case "/respondQuote":
-                 respondToQuote(request, response);
-                 break;
+        	case "/respondQuote":
+                respondToQuote(request, response);
+                break;
+        	case "/rejectTree":
+        	    rejectTree(request, response);
+        	    break;     
         	case "/initialize":
         		userDAO.init();
         		System.out.println("Database successfully initialized!");
@@ -109,6 +112,17 @@ public class ControlServlet extends HttpServlet {
         		System.out.println("The action is: listBillMessages");
         		listBillMessages(request, response);
         		break;
+        	case "/agreeToQuote":
+                agreeToQuote(request, response);
+                break;
+        	case "/finishOrder":
+        	    finishOrder(request, response);
+        	    break;
+        	case "/payBill":
+        	    payBill(request, response);
+        	    break;
+        	case "/negotiateBill":
+        		negotiateBill(request, response);
 	    	}
 	    }
 	    catch(Exception ex) {
@@ -210,6 +224,15 @@ public class ControlServlet extends HttpServlet {
 			request.setAttribute("listOrders", userDAO.listAllOrders());
 			request.setAttribute("listBills", userDAO.listAllBills());
 			request.setAttribute("listBillMessages", userDAO.listAllBillMessages());
+		    request.setAttribute("listBigClients", userDAO.listBigClients());
+		    request.setAttribute("listEasyClients", userDAO.listEasyClients());
+		    request.setAttribute("listOneTreeQuotes", userDAO.listOneTreeQuotes());
+		    request.setAttribute("listProspectiveClients", userDAO.listProspectiveClients());
+		    request.setAttribute("listHighestTrees", userDAO.listHighestTrees());
+		    request.setAttribute("listOverdueBills", userDAO.listOverdueBills());
+		    request.setAttribute("listBadClients", userDAO.listBadClients());
+		    request.setAttribute("listGoodClients", userDAO.listGoodClients());
+		    request.setAttribute("listClientStatistics", userDAO.listClientStatistics());
 	    	request.getRequestDispatcher("rootView.jsp").forward(request, response);
 	    }
 	    
@@ -218,6 +241,10 @@ public class ControlServlet extends HttpServlet {
 	        request.setAttribute("listTreeWithoutQuote", listTreeWithoutQuote);
 	        List<QuoteMessageWithPrice>listAllQuoteMessagesWithPrice = userDAO.listAllQuoteMessagesWithPrice();
 	        request.setAttribute("listAllQuoteMessagesWithPrice", listAllQuoteMessagesWithPrice);
+	        request.setAttribute("listAllOrders", userDAO.listAllOrders());
+	        RevenueStatistics revenueStats = userDAO.getRevenueStatistics();
+	        request.setAttribute("listAllBills", userDAO.listAllBills());
+	        request.setAttribute("revenueStats", revenueStats);
 	    	request.getRequestDispatcher("davidSmithDashboard.jsp").forward(request, response);
 	    }
 	    
@@ -247,16 +274,16 @@ public class ControlServlet extends HttpServlet {
 	    	        session.setAttribute("username", email); 
 	    	        session.setAttribute("userID", clientID);
 
-	    	        // Fetch quotes for this clientID
 	    	        userDAO userDAO = new userDAO();
 	    	        List<Quote> userQuotes = userDAO.getQuotesByClientID(clientID);
 	    	        session.setAttribute("userQuotes", userQuotes);
+	    	        
+	    	        List<Bills> userBills = userDAO.getBillsByClientID(clientID); // Assuming you have such a method
+	    	        session.setAttribute("userBills", userBills);
 
-	    	        // Redirect to activitypage.jsp
 	    	        RequestDispatcher dispatcher = request.getRequestDispatcher("activitypage.jsp");
 	    	        dispatcher.forward(request, response);
 	    	    } else {
-	    	        // Handle login failure
 	    	        request.setAttribute("loginFailedStr", "Login Failed: Wrong password or username.");
 	    	        request.getRequestDispatcher("login.jsp").forward(request, response);
 	    	    }
@@ -334,17 +361,17 @@ public class ControlServlet extends HttpServlet {
 	    
 	    private void initialQuote(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
 	    	String initialPrice = request.getParameter("initialPrice");
-	    	String timeWindow = request.getParameter("timeWindow");
+	    	String scheduleStart = request.getParameter("scheduleStart");
+	    	String scheduleEnd = request.getParameter("scheduleEnd");
 	    	String treeID = request.getParameter("treeID");
 	    	if (treeID == null || treeID.isEmpty()) {
-	    	    // Handle missing treeID
 	    	    request.setAttribute("errorMessage", "Tree ID is required.");
 	    	    request.getRequestDispatcher("processQuote.jsp").forward(request, response);
 	    	    return;
 	    	    }
 	        String status = request.getParameter("status");
 	        if (status == null || status.isEmpty()) {
-	            status = "pending";
+	            status = "Pending";
 	        }
 
 	        String clientID = request.getParameter("clientID");
@@ -358,15 +385,14 @@ public class ControlServlet extends HttpServlet {
 	        }
 	        
 	        if (initialPrice == null || initialPrice.isEmpty() ||
-	        		timeWindow == null || timeWindow.isEmpty() || 
-	        		        clientID == null || clientID.isEmpty()) {
+	        		scheduleStart == null || scheduleStart.isEmpty() ||
+	        				scheduleEnd == null || scheduleEnd.isEmpty() ||
+	        		        	clientID == null || clientID.isEmpty()) {
 
-		            // Set error message in request and forward to the form page
 		            request.setAttribute("errorMessage", "All fields are required.");
 		            request.getRequestDispatcher("processQuote.jsp").forward(request, response);
 		        } else {
-		            // Proceed with normal flow if all fields are filled
-		            Quote quote = new Quote(initialPrice, timeWindow, status, clientID, contractorID);
+		            Quote quote = new Quote(initialPrice, scheduleStart, scheduleEnd, status, clientID, contractorID);
 		            userDAO.insertQuote(quote, treeID);
 		            
 		            request.getSession().setAttribute("successMessage", "Request Submitted Successfully. Please wait for a response.");
@@ -377,27 +403,27 @@ public class ControlServlet extends HttpServlet {
 	    
 	    private void initialRequest(HttpServletRequest request, HttpServletResponse response)
 	            throws ServletException, IOException, SQLException {
-	        // Get parameters from request
+
 	        String size = request.getParameter("size");
 	        String height = request.getParameter("height");
 	        String location = request.getParameter("location");
 	        String proximityToHouse = request.getParameter("proximityToHouse");
+	        String treeNo = request.getParameter("treeNo");
 	        String clientID = request.getParameter("clientID");
 	        String quoteID = request.getParameter("quoteID");
 
-	        // Check for empty fields
+
 	        if (size == null || size.isEmpty() ||
 	            height == null || height.isEmpty() ||
 	            location == null || location.isEmpty() ||
 	            proximityToHouse == null || proximityToHouse.isEmpty() ||
 	            clientID == null || clientID.isEmpty()) {
 
-	            // Set error message in request and forward to the form page
+
 	            request.setAttribute("errorMessage", "All fields are required.");
 	            request.getRequestDispatcher("activitypage.jsp").forward(request, response);
 	        } else {
-	            // Proceed with normal flow if all fields are filled
-	            Tree tree = new Tree(size, height, location, proximityToHouse, clientID, quoteID);
+	            Tree tree = new Tree(size, height, location, proximityToHouse, treeNo,  clientID, quoteID);
 	            userDAO.insertTree(tree);
 	            
 	            request.getSession().setAttribute("successMessage", "Request Submitted Successfully. Please wait for a response.");
@@ -410,19 +436,18 @@ public class ControlServlet extends HttpServlet {
 	        String quoteID = request.getParameter("quoteID");
 	        String responseAction = request.getParameter("response");
 	        String userID = (String) request.getSession().getAttribute("userID");
+	    
+	        
+	        userDAO dao = new userDAO();
 
 	        try {
 	            if (quoteID == null || quoteID.isEmpty() || responseAction == null || responseAction.isEmpty()) {
-	                // Set error message in request and forward to the form page
 	                request.setAttribute("errorMessage", "Quote ID and Response Action are required.");
 	                request.getRequestDispatcher("RespondQuote.jsp").forward(request, response);
 	                return;
 	            }
 
-	            if ("agree".equals(responseAction)) {
-	                Bills bill = new Bills("orderID", "price", "0", "balance", "Unpaid");
-	                userDAO.insertBill(bill);
-	            } else if ("decline".equals(responseAction)) {
+	            if ("decline".equals(responseAction)) {
 	                userDAO.deleteQuote(quoteID);
 	            } else if ("negotiate".equals(responseAction)) {
 	                String note = request.getParameter("note");
@@ -436,8 +461,12 @@ public class ControlServlet extends HttpServlet {
 	                userDAO.insertQuoteMessage(quoteMessage);
 	            }
 
-	            request.getSession().setAttribute("successMessage", "Response to quote processed successfully.");
-	            response.sendRedirect("RespondQuote.jsp");
+	            HttpSession session = request.getSession();
+	            String clientID = (String) session.getAttribute("userID");
+	            List<Quote> updatedQuotes = dao.getQuotesByClientID(clientID);
+
+	            session.setAttribute("userQuotes", updatedQuotes);
+	            response.sendRedirect("activitypage.jsp"); 
 	        } catch (SQLException e) {
 	            request.setAttribute("errorMessage", "Database access error: " + e.getMessage());
 	            request.getRequestDispatcher("RespondQuote.jsp").forward(request, response);
@@ -447,10 +476,11 @@ public class ControlServlet extends HttpServlet {
 	    private void updateQuoteDetails(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	        String quoteID = request.getParameter("quoteID");
 	        String newPrice = request.getParameter("price");
-	        String newTimeWindow = request.getParameter("timeWindow");
+	        String newScheduleStart = request.getParameter("scheduleStart");
+	        String newScheduleEnd = request.getParameter("scheduleEnd");
 
 	        try {
-	            userDAO.updateQuoteDetails(quoteID, newPrice, newTimeWindow);
+	            userDAO.updateQuoteDetails(quoteID, newPrice, newScheduleStart, newScheduleEnd);
 	            request.setAttribute("message", "Quote updated successfully");
 	            RequestDispatcher dispatcher = request.getRequestDispatcher("davidSmithDashboard.jsp");
 	            davidSmithDashBoard(request, response, "");
@@ -460,18 +490,101 @@ public class ControlServlet extends HttpServlet {
 	        }
 	    }
 	    
+	    private void agreeToQuote(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	        String quoteID = request.getParameter("quoteID");
+	        String clientID = request.getParameter("clientID");
+	        String price = request.getParameter("initialPrice");
+	        String scheduleStart = request.getParameter("scheduleStart");
+	        String scheduleEnd = request.getParameter("scheduleEnd");
+
+	        userDAO dao = new userDAO();
+	        try {
+	            dao.agreeToQuote(quoteID, clientID, price, scheduleStart, scheduleEnd);
+
+	            HttpSession session = request.getSession();
+	            String userID = (String) session.getAttribute("userID");
+	            List<Quote> updatedQuotes = dao.getQuotesByClientID(userID);
+
+	            session.setAttribute("userQuotes", updatedQuotes);
+	            response.sendRedirect("activitypage.jsp"); 
+	        } catch (SQLException e) {
+	            throw new ServletException("Database error: " + e.getMessage());
+	        }
+	    }
+	    
+	    private void finishOrder(HttpServletRequest request, HttpServletResponse response) 
+	            throws ServletException, IOException, SQLException {
+	        String orderID = request.getParameter("orderID");
+	        String clientID = request.getParameter("clientID");
+	        String price = request.getParameter("price");
+
+	        userDAO.createBill(orderID, clientID, price, new java.sql.Date(System.currentTimeMillis()));
+	        userDAO.updateOrderStatus(orderID, "Finished");
+	        
+	        List<Tree> listTreeWithoutQuote = userDAO.listTreesWithoutQuote();
+	        List<QuoteMessageWithPrice> listAllQuoteMessagesWithPrice = userDAO.listAllQuoteMessagesWithPrice();
+	        List<Order> listAllOrders = userDAO.listAllOrders();
+
+	        HttpSession session = request.getSession();
+	        session.setAttribute("listTreeWithoutQuote", listTreeWithoutQuote);
+	        session.setAttribute("listAllQuoteMessagesWithPrice", listAllQuoteMessagesWithPrice);
+	        session.setAttribute("listAllOrders", listAllOrders);
+
+	        response.sendRedirect("davidSmithDashboard.jsp");
+	    }
+	    
+	    
+	    private void rejectTree(HttpServletRequest request, HttpServletResponse response) 
+	            throws ServletException, IOException, SQLException {
+	        String treeID = request.getParameter("treeID");
+
+	        userDAO.deleteTree(treeID);
+
+	        List<Tree> listTreeWithoutQuote = userDAO.listTreesWithoutQuote();
+	        List<QuoteMessageWithPrice> listAllQuoteMessagesWithPrice = userDAO.listAllQuoteMessagesWithPrice();
+	        List<Order> listAllOrders = userDAO.listAllOrders();
+	        HttpSession session = request.getSession();
+	        session.setAttribute("listTreeWithoutQuote", listTreeWithoutQuote);
+	        session.setAttribute("listAllQuoteMessagesWithPrice", listAllQuoteMessagesWithPrice);
+	        session.setAttribute("listAllOrders", listAllOrders);
+
+	        response.sendRedirect("davidSmithDashboard.jsp");
+	    }
+	    
+	    private void payBill(HttpServletRequest request, HttpServletResponse response) 
+	            throws ServletException, IOException, SQLException {
+	        String billID = request.getParameter("billID");
+	        String clientID = (String) request.getSession().getAttribute("userID");
+
+	        userDAO.payBill(billID, new java.sql.Date(System.currentTimeMillis()));
+	        
+	        List<Bills> userBills = userDAO.getBillsByClientID(clientID);
+	        HttpSession session = request.getSession();
+	        session.setAttribute("userBills", userBills);
+
+	        response.sendRedirect("activitypage.jsp"); 
+	        
+	    }
+	    
+	    private void negotiateBill(HttpServletRequest request, HttpServletResponse response) 
+	            throws SQLException, IOException, ServletException {
+	        String billID = request.getParameter("billID");
+	        String clientID = request.getParameter("clientID");
+	        String price = request.getParameter("price");
+	        String note = request.getParameter("note");
+
+	        userDAO dao = new userDAO();
+	        dao.insertBillMessage(new BillMessages(clientID, billID, LocalDateTime.now().toString(), price, note));
+
+	        // Redirect to the appropriate page or show confirmation
+	        // For example, redirect back to the activity page
+	        response.sendRedirect("activitypage.jsp"); // or any other relevant JSP page
+	    }
+	    
 	    private void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	    	currentUser = "";
         		response.sendRedirect("login.jsp");
         	}
-	
-	    
-
-	     
-        
-	    
-	    
-	    
 	    
 	    
 }
